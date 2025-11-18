@@ -1,28 +1,18 @@
 import "./style.css";
-import { Application, Assets, Container, Sprite } from "pixi.js";
+import { Application, Ticker } from "pixi.js";
+import { GameScene } from "./components";
 
-console.log("HELLO");
-function component() {
-    const element = document.createElement("div");
+(async () => {
+    const app = new Application();
+    await app.init({ background: "#1099bb", resizeTo: window });
 
-    element.innerHTML = "Hello Webpack";
-
-    return element;
-}
-
-document.body.appendChild(component());
-
-const app = new Application();
-app.init({ background: "#1099bb", resizeTo: window });
-
-window.onload = async () => {
     document.body.appendChild(app.canvas);
-};
 
-const container = new Container();
+    const gameScene = new GameScene();
 
-app.stage.addChild(container);
+    app.stage.addChild(gameScene);
 
-app.ticker.add(() => {
-    // game.update();
-});
+    app.ticker.add((ticker: Ticker) => {
+        gameScene.update();
+    });
+})();

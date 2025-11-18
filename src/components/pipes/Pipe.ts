@@ -9,7 +9,9 @@ export class Pipe extends Container {
     private _id: number;
     private _config: PipeConfig;
     private _sprite: Sprite;
-    private _isActive = false;
+    private _isActive: boolean = false;
+
+    private _isGrowing: boolean = false;
 
     constructor(config: PipeConfig) {
         super(config.texture);
@@ -27,8 +29,32 @@ export class Pipe extends Container {
         this._isActive = value;
         if (value) {
             this.cursor = "pointer";
+            this._isGrowing = true;
         } else {
             this.cursor = "arrow";
+            this._isGrowing = false;
         }
+    }
+
+    update() {
+        if (this._isActive) {
+            if (this._isGrowing) {
+                if (this.scale.x < 1.2) {
+                    this.scale.set(this.scale.x + 0.02);
+                } else {
+                    this._isGrowing = false;
+                }
+            } else {
+                if (this.scale.x > 0.8) {
+                    this.scale.set(this.scale.x - 0.02);
+                } else {
+                    this._isGrowing = true;
+                }
+            }
+        }
+    }
+
+    reset() {
+        this.setActive(false);
     }
 }

@@ -9,7 +9,7 @@ interface PipeQueueConfig {
 export class PipeQueue extends Container {
     private _config: PipeQueueConfig;
     private _randomPipeGenerator: RandomPipeGenerator;
-    private pipes: Pipe[];
+    private pipes: Pipe[] = [];
     private _isActive = false;
 
     constructor(
@@ -28,18 +28,36 @@ export class PipeQueue extends Container {
         const padding = 10;
         for (let i = 0; i < this._config.length; i++) {
             const pipe = this._randomPipeGenerator.generate();
-            console.log(pipe);
             pipe.y = i * (pipe.height + padding);
+            this.pipes.push(pipe);
             this.addChild(pipe);
         }
     }
 
-    setActive(value: boolean) {
-        this._isActive = value;
-        if (value) {
-            this.cursor = "pointer";
-        } else {
-            this.cursor = "arrow";
-        }
+    // setActive(value: boolean) {
+    //     this._isActive = value;
+    //     if (value) {
+    //         this.cursor = "pointer";
+    //     } else {
+    //         this.cursor = "arrow";
+    //     }
+    // }
+
+    activate() {
+        this._isActive = true;
+        this.pipes[0].setActive(true);
+    }
+
+    deactivate() {
+        this._isActive = false;
+        this.pipes.forEach((pipe: Pipe) => pipe.setActive(false));
+    }
+
+    reset() {
+        this.pipes.forEach((pipe: Pipe) => pipe.reset());
+    }
+
+    update() {
+        this.pipes.forEach((pipe: Pipe) => pipe.update());
     }
 }

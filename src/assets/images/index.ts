@@ -6,13 +6,18 @@ export const pipesAtlas = {
             sourceSize: { w: 32, h: 32 },
             spriteSourceSize: { x: 0, y: 0, w: 32, h: 32 },
         },
-        curve: {
+        curved: {
             frame: { x: 0, y: 0, w: 32, h: 32 },
             sourceSize: { w: 32, h: 32 },
             spriteSourceSize: { x: 0, y: 0, w: 32, h: 32 },
         },
         cross: {
             frame: { x: 0, y: 64, w: 32, h: 32 },
+            sourceSize: { w: 32, h: 32 },
+            spriteSourceSize: { x: 0, y: 0, w: 32, h: 32 },
+        },
+        start: {
+            frame: { x: 128, y: 64, w: 32, h: 32 },
             sourceSize: { w: 32, h: 32 },
             spriteSourceSize: { x: 0, y: 0, w: 32, h: 32 },
         },

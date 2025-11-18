@@ -27,7 +27,8 @@ export class RandomPipeGenerator {
     generate(): Pipe {
         const allRotations = [0, 90, 180, 360];
         // const allTypes = Object.keys(PIPE_TYPES);
-        const allTextures = Object.values(this._pipesSpritesheet.textures);
+        const { straight, cross, curved } = this._pipesSpritesheet.textures;
+        const allTextures = [straight, cross, curved];
 
         // const randomtype = getRandomElement(allTypes);
         const randomTexture = getRandomElement(allTextures);

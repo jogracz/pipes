@@ -16,10 +16,10 @@ const PIPE_QUEUE_LENGHT = 7;
 export class GameScene extends Container {
     private _isLoaded = false;
     private _loader: Text;
-    private _sprite: Sprite;
-    private _pipesSpritesheet: Spritesheet<typeof pipesAtlas>;
-    private _pipeQueue: PipeQueue;
+    private pipesSpritesheet: Spritesheet<typeof pipesAtlas>;
+    private pipeQueue: PipeQueue;
     private grid: Grid;
+    isStarted: boolean = false;
 
     private _randomPipeGenerator: RandomPipeGenerator;
 
@@ -31,9 +31,8 @@ export class GameScene extends Container {
 
         this.load().then(() => {
             this._randomPipeGenerator = new RandomPipeGenerator(
-                this._pipesSpritesheet
+                this.pipesSpritesheet
             );
-            // this._pipeQueue = new PipeQueue({ length: PIPE_QUEUE_LENGHT });
             this.mountComponents();
         });
         this.relayout();
@@ -53,17 +52,11 @@ export class GameScene extends Container {
 
     async load() {
         const texture = await Assets.load(pipes_spritesheet);
-        this._pipesSpritesheet = new Spritesheet(texture, pipesAtlas);
-        await this._pipesSpritesheet.parse();
+        this.pipesSpritesheet = new Spritesheet(texture, pipesAtlas);
+        await this.pipesSpritesheet.parse();
 
         this._isLoaded = true;
         this.removeChild(this._loader);
-
-        // remove later:
-
-        // const sprite = Sprite.from(this._pipesSpritesheet.textures.straight);
-        // this.addChild(sprite);
-        // this._sprite = sprite;
         //Add POOLING
     }
 
@@ -82,15 +75,19 @@ export class GameScene extends Container {
         //     pipeQueueContainer.addChild(pipe);
         // }
         // this.addChild(pipeQueueContainer);
-        this._pipeQueue = new PipeQueue(
+        this.pipeQueue = new PipeQueue(
             { length: PIPE_QUEUE_LENGHT },
             this._randomPipeGenerator
         );
-        this.addChild(this._pipeQueue);
+        this.addChild(this.pipeQueue);
     }
 
     mountGrid() {
-        this.grid = new Grid({ columns: 9, rows: 7 });
+        this.grid = new Grid({
+            columnsCount: 9,
+            rowsCount: 7,
+            blockersCount: 5,
+        });
         this.grid.x = 50;
         this.addChild(this.grid);
     }
@@ -99,9 +96,20 @@ export class GameScene extends Container {
         return this._isLoaded;
     }
 
+    gameStart() {
+        this.grid.activate();
+        this.pipeQueue.activate();
+    }
+
     async update() {
         if (this.isLoaded) {
             // this._sprite.x += 1;
+            this.pipeQueue.update();
+
+            if (!this.isStarted) {
+                this.isStarted = true;
+                this.gameStart();
+            }
         }
         // Load assets
         // Assets.add({

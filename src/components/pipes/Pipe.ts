@@ -36,21 +36,25 @@ export class Pipe extends Container {
         }
     }
 
+    animateActive() {
+        if (this._isGrowing) {
+            if (this.scale.x < 1.2) {
+                this.scale.set(this.scale.x + 0.02);
+            } else {
+                this._isGrowing = false;
+            }
+        } else {
+            if (this.scale.x > 0.8) {
+                this.scale.set(this.scale.x - 0.02);
+            } else {
+                this._isGrowing = true;
+            }
+        }
+    }
+
     update() {
         if (this._isActive) {
-            if (this._isGrowing) {
-                if (this.scale.x < 1.2) {
-                    this.scale.set(this.scale.x + 0.02);
-                } else {
-                    this._isGrowing = false;
-                }
-            } else {
-                if (this.scale.x > 0.8) {
-                    this.scale.set(this.scale.x - 0.02);
-                } else {
-                    this._isGrowing = true;
-                }
-            }
+            this.animateActive();
         }
     }
 

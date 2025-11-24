@@ -3,24 +3,26 @@ import { Application, Ticker } from "pixi.js";
 import { GameScene } from "./components";
 import { gsap } from "gsap";
 import { PixiPlugin } from "gsap/PixiPlugin";
+import { GameMediator } from "./mediator";
 
 gsap.registerPlugin(PixiPlugin);
 
 (async () => {
-    const app = new Application();
-    await app.init({
+    const pixiApp = new Application();
+    await pixiApp.init({
         background: "#1099bb",
         resizeTo: window,
     });
 
-    document.body.appendChild(app.canvas);
+    document.body.appendChild(pixiApp.canvas);
 
-    const gameScene = new GameScene();
+    // const gameScene = new GameScene();
+    const gameMediator = new GameMediator();
 
-    app.stage.addChild(gameScene);
-    window.addEventListener("resize", gameScene.relayout);
+    pixiApp.stage.addChild(gameMediator.gameScene);
+    // window.addEventListener("resize", gameScene.relayout);
 
-    app.ticker.add((ticker: Ticker) => {
-        gameScene.update();
+    pixiApp.ticker.add((ticker: Ticker) => {
+        gameMediator.update();
     });
 })();

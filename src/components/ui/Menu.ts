@@ -31,7 +31,6 @@ export class Menu extends Container {
     }
 
     async awaitClick() {
-        console.log("PWIEPEOEO");
         await new Promise<void>((resolve) => {
             const onClick = () => {
                 console.log("!");
@@ -47,7 +46,7 @@ export class Menu extends Container {
     async hide() {
         await gsap.to(this, {
             alpha: 0,
-            duration: 0.3,
+            duration: 0.2,
         });
         this.visible = false;
     }
@@ -56,7 +55,7 @@ export class Menu extends Container {
         this.visible = true;
         await gsap.to(this, {
             alpha: 1,
-            duration: 0.3,
+            duration: 0.2,
         });
     }
 

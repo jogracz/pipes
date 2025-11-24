@@ -6,16 +6,17 @@ import {
     Text,
     TextStyle,
 } from "pixi.js";
-import { pipesAtlas, pipes_spritesheet } from "../assets";
+import { pipesAtlas, pipes_spritesheet, menu, button } from "../assets";
 import { Grid } from "./grid";
-import { RandomPipeGenerator } from "./pipes";
-import { PipeQueue } from "./pipes/PipeQueue";
+import { RandomPipeGenerator, PipeQueue } from "./pipes";
+import { Menu } from "./ui";
 
 const PIPE_QUEUE_LENGHT = 7;
 
 export class GameScene extends Container {
     private _isLoaded = false;
     private _loader: Text;
+    private menu: Menu;
     private pipesSpritesheet: Spritesheet<typeof pipesAtlas>;
     private pipeQueue: PipeQueue;
     private grid: Grid;
@@ -51,16 +52,18 @@ export class GameScene extends Container {
     }
 
     async load() {
-        const texture = await Assets.load(pipes_spritesheet);
-        this.pipesSpritesheet = new Spritesheet(texture, pipesAtlas);
+        await Assets.load({ alias: "button", src: button });
+        await Assets.load({ alias: "menu", src: menu });
+        const pipeTexture = await Assets.load(pipes_spritesheet);
+        this.pipesSpritesheet = new Spritesheet(pipeTexture, pipesAtlas);
         await this.pipesSpritesheet.parse();
 
         this._isLoaded = true;
         this.removeChild(this._loader);
-        //Add POOLING
     }
 
     mountComponents() {
+        this.mountMenu();
         this.mountPipeQueue();
         this.mountGrid();
     }
@@ -79,6 +82,7 @@ export class GameScene extends Container {
             { length: PIPE_QUEUE_LENGHT },
             this._randomPipeGenerator
         );
+        this.pipeQueue.visible = false;
         this.addChild(this.pipeQueue);
     }
 
@@ -89,7 +93,13 @@ export class GameScene extends Container {
             blockersCount: 5,
         });
         this.grid.x = 50;
+        this.grid.visible = false;
         this.addChild(this.grid);
+    }
+
+    mountMenu() {
+        this.menu = new Menu();
+        this.addChild(this.menu);
     }
 
     get isLoaded() {
@@ -99,6 +109,19 @@ export class GameScene extends Container {
     gameStart() {
         this.grid.activate();
         this.pipeQueue.activate();
+    }
+
+    showBoard() {
+        this.grid.visible = true;
+        this.pipeQueue.visible = true;
+    }
+
+    get components() {
+        return {
+            menu: this.menu,
+            grid: this.grid,
+            pipeQueue: this.pipeQueue,
+        };
     }
 
     async update() {
@@ -126,7 +149,7 @@ export class GameScene extends Container {
     }
 
     relayout() {
-        this.x = 100;
-        this.y = 100;
+        this.x = window.innerWidth / 2;
+        this.y = window.innerHeight / 2;
     }
 }

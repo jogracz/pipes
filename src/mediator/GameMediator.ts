@@ -1,4 +1,3 @@
-import { pipe } from "gsap/all";
 import { GameScene } from "../components";
 
 export class GameMediator {
@@ -6,6 +5,16 @@ export class GameMediator {
 
     constructor() {
         this._gameScene = new GameScene();
+    }
+
+    async loadAssets() {
+        await this.gameScene.load();
+    }
+
+    async startGame() {
+        await this.gameScene.components.menu.awaitClick();
+        this.gameScene.showBoard();
+        await this.gameScene.components.menu.hide();
     }
 
     get gameScene() {

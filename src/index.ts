@@ -25,4 +25,7 @@ gsap.registerPlugin(PixiPlugin);
     pixiApp.ticker.add((ticker: Ticker) => {
         gameMediator.update();
     });
+
+    await gameMediator.loadAssets();
+    await gameMediator.startGame();
 })();

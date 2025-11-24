@@ -32,6 +32,8 @@ export class Cell extends Container {
     get isBlocked() {
         return this._isBlocked;
     }
+
+    // TODO: separate into 2: on hover and onhoverened
     async onHover() {
         if (this.isBlocked && !this._isActive) return;
         const vars = {

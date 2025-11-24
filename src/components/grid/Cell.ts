@@ -1,3 +1,4 @@
+import gsap from "gsap/all";
 import { Container, Graphics } from "pixi.js";
 import { Pipe } from "../pipes";
 
@@ -18,13 +19,39 @@ export class Cell extends Container {
     constructor(config: CellConfig) {
         super();
         this.config = config;
-        this.background = new Graphics().rect(0, 0, 32, 32).fill(COLOR_DEFAULT);
-        this.eventMode = "static";
+        this.background = new Graphics()
+            .rect(-16, -16, 32, 32)
+            .fill(COLOR_DEFAULT);
+
         this.addChild(this.background);
+
+        this.eventMode = "static";
+        this.on("pointerover", this.onHover);
     }
 
     get isBlocked() {
         return this._isBlocked;
+    }
+    async onHover() {
+        if (this.isBlocked && !this._isActive) return;
+        const vars = {
+            scale: 1,
+        };
+        await gsap.to(vars, {
+            scale: 0.95,
+            onUpdate: () => {
+                this.scale.set(vars.scale);
+            },
+            duration: 0.15,
+        });
+
+        await gsap.to(vars, {
+            scale: 1.05,
+            onUpdate: () => {
+                this.scale.set(vars.scale);
+            },
+            duration: 0.15,
+        });
     }
 
     block() {
@@ -46,7 +73,6 @@ export class Cell extends Container {
     }
 
     setActive(value: boolean) {
-        console.log("active", value);
         this._isActive = value;
         if (value) {
             this.cursor = "pointer";

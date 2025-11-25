@@ -14,7 +14,6 @@ export class Menu extends Container {
         this.button = Sprite.from(Assets.get("button"));
         this.button.anchor.set(0.5);
         this.button.eventMode = "static";
-
         this.buttonLabel = new Text({
             text: "Start",
             style: new TextStyle({
@@ -28,9 +27,12 @@ export class Menu extends Container {
         this.addChild(this.bg);
         this.addChild(this.button);
         this.button.addChild(this.buttonLabel);
+
+        this.button.on("pointerover", this.onHover);
+        this.button.on("pointerout", this.onHoverEnd);
     }
 
-    async awaitClick() {
+    async awaitStartClick() {
         await new Promise<void>((resolve) => {
             const onClick = () => {
                 console.log("!");
@@ -41,6 +43,36 @@ export class Menu extends Container {
         });
         this.button.onclick = null;
         this.button.cursor = "arrow";
+    }
+
+    async onHover() {
+        // if (this.isBlocked && !this._isActive) return;
+        const vars = {
+            scale: 1,
+        };
+        await gsap.to(vars, {
+            scale: 0.98,
+            onUpdate: () => {
+                this.scale.set(vars.scale);
+            },
+            duration: 0.1,
+        });
+    }
+
+    async onHoverEnd() {
+        // if (this.isBlocked && !this._isActive) return;
+
+        const vars = {
+            scale: 0.98,
+        };
+
+        await gsap.to(vars, {
+            scale: 1,
+            onUpdate: () => {
+                this.scale.set(vars.scale);
+            },
+            duration: 0.15,
+        });
     }
 
     async hide() {
@@ -63,4 +95,6 @@ export class Menu extends Container {
         this.visible = true;
         this.alpha = 1;
     }
+
+    relayout() {}
 }

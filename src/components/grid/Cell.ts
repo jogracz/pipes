@@ -27,28 +27,44 @@ export class Cell extends Container {
 
         this.eventMode = "static";
         this.on("pointerover", this.onHover);
+        this.on("pointerout", this.onHoverEnd);
     }
 
     get isBlocked() {
         return this._isBlocked;
     }
 
-    // TODO: separate into 2: on hover and onhoverened
     async onHover() {
         if (this.isBlocked && !this._isActive) return;
         const vars = {
             scale: 1,
         };
         await gsap.to(vars, {
+            scale: 0.9,
+            onUpdate: () => {
+                this.scale.set(vars.scale);
+            },
+            duration: 0.1,
+        });
+
+        await gsap.to(vars, {
             scale: 0.95,
             onUpdate: () => {
                 this.scale.set(vars.scale);
             },
-            duration: 0.15,
+            duration: 0.05,
         });
+    }
+
+    async onHoverEnd() {
+        if (this.isBlocked && !this._isActive) return;
+
+        const vars = {
+            scale: 0.95,
+        };
 
         await gsap.to(vars, {
-            scale: 1.05,
+            scale: 1,
             onUpdate: () => {
                 this.scale.set(vars.scale);
             },

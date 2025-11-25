@@ -1,14 +1,7 @@
-import {
-    Assets,
-    Container,
-    Sprite,
-    Spritesheet,
-    Text,
-    TextStyle,
-} from "pixi.js";
+import { Assets, Container, Spritesheet, Text, TextStyle } from "pixi.js";
 import { pipesAtlas, pipes_spritesheet, menu, button } from "../assets";
 import { Grid } from "./grid";
-import { RandomPipeGenerator, PipeQueue } from "./pipes";
+import { RandomPipeGenerator, PipeQueue, Pipe } from "./pipes";
 import { Menu } from "./ui";
 
 const PIPE_QUEUE_LENGHT = 7;
@@ -20,6 +13,7 @@ export class GameScene extends Container {
     private pipesSpritesheet: Spritesheet<typeof pipesAtlas>;
     private pipeQueue: PipeQueue;
     private grid: Grid;
+    private startPipe: Pipe;
     isStarted: boolean = false;
 
     private _randomPipeGenerator: RandomPipeGenerator;
@@ -35,8 +29,8 @@ export class GameScene extends Container {
                 this.pipesSpritesheet
             );
             this.mountComponents();
+            this.relayout();
         });
-        this.relayout();
     }
 
     createLoader() {
@@ -48,6 +42,9 @@ export class GameScene extends Container {
             fill: "#66CCCC",
         });
         loader.text = "Loading...";
+        loader.x = window.innerWidth / 2;
+        loader.y = window.innerHeight / 2;
+        loader.anchor.set(0.5);
         return loader;
     }
 
@@ -66,6 +63,7 @@ export class GameScene extends Container {
         this.mountMenu();
         this.mountPipeQueue();
         this.mountGrid();
+        this.mountStartPipe();
     }
 
     mountPipeQueue() {
@@ -97,6 +95,14 @@ export class GameScene extends Container {
         this.addChild(this.grid);
     }
 
+    mountStartPipe() {
+        this.startPipe = new Pipe({
+            texture: this.pipesSpritesheet.textures.start,
+            rotation: 0,
+        });
+        this.startPipe.visible = false;
+    }
+
     mountMenu() {
         this.menu = new Menu();
         this.addChild(this.menu);
@@ -106,7 +112,7 @@ export class GameScene extends Container {
         return this._isLoaded;
     }
 
-    gameStart() {
+    activateBoard() {
         this.grid.activate();
         this.pipeQueue.activate();
     }
@@ -128,11 +134,6 @@ export class GameScene extends Container {
         if (this.isLoaded) {
             // this._sprite.x += 1;
             this.pipeQueue.update();
-
-            if (!this.isStarted) {
-                this.isStarted = true;
-                this.gameStart();
-            }
         }
         // Load assets
         // Assets.add({
@@ -151,5 +152,15 @@ export class GameScene extends Container {
     relayout() {
         this.x = window.innerWidth / 2;
         this.y = window.innerHeight / 2;
+
+        Object.values(this.components).forEach((component) =>
+            component.relayout()
+        );
+        this.pipeQueue.x = this.pipeQueue.x + this.grid.x - 20;
+    }
+
+    reset() {
+        this.grid.reset(this.startPipe);
+        this.pipeQueue.reset();
     }
 }

@@ -12,9 +12,11 @@ export class GameMediator {
     }
 
     async startGame() {
-        await this.gameScene.components.menu.awaitClick();
+        await this.gameScene.components.menu.awaitStartClick();
+        this.gameScene.reset();
         this.gameScene.showBoard();
         await this.gameScene.components.menu.hide();
+        this.gameScene.activateBoard();
     }
 
     get gameScene() {

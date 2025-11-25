@@ -14,6 +14,7 @@ export class Cell extends Container {
     private background: Graphics;
     private _isBlocked = false;
     private _isActive: boolean = false;
+    private _isStart: boolean = false;
     pipe: Pipe;
 
     constructor(config: CellConfig) {
@@ -26,15 +27,11 @@ export class Cell extends Container {
         this.addChild(this.background);
 
         this.eventMode = "static";
-        this.on("pointerover", this.onHover);
-        this.on("pointerout", this.onHoverEnd);
+        // this.on("pointerover", this.onHover);
+        // this.on("pointerout", this.onHoverEnd);
     }
 
-    get isBlocked() {
-        return this._isBlocked;
-    }
-
-    async onHover() {
+    private async onHover() {
         if (this.isBlocked && !this._isActive) return;
         const vars = {
             scale: 1,
@@ -56,7 +53,7 @@ export class Cell extends Container {
         });
     }
 
-    async onHoverEnd() {
+    private async onHoverEnd() {
         if (this.isBlocked && !this._isActive) return;
 
         const vars = {
@@ -72,6 +69,14 @@ export class Cell extends Container {
         });
     }
 
+    get isBlocked() {
+        return this._isBlocked;
+    }
+
+    get hasPipe() {
+        return !!this.pipe;
+    }
+
     block() {
         this._isBlocked = true;
         this.alpha = OPACITY_BLOCKED;
@@ -82,26 +87,51 @@ export class Cell extends Container {
         this.alpha = OPACITY_DEFAULT;
     }
 
-    addPipe(pipe: Pipe) {
+    private addPipe(pipe: Pipe) {
         this.pipe = pipe;
+        this.pipe.visible = true;
+        this.addChild(this.pipe);
+        this.setActive(false);
     }
 
     removePipe() {
         this.pipe = null;
     }
 
+    private addHoverAnimation() {
+        this.addEventListener("pointerover", () => this.onHover());
+        this.addEventListener("pointerout", () => this.onHoverEnd());
+    }
+
+    private removeHoverAnimation() {
+        this.removeEventListener("pointerover", () => this.onHover());
+        this.removeEventListener("pointerout", () => this.onHoverEnd());
+    }
+
     setActive(value: boolean) {
         this._isActive = value;
         if (value) {
             this.cursor = "pointer";
+            this.addHoverAnimation();
         } else {
             this.cursor = "arrow";
+            this.removeHoverAnimation();
         }
+    }
+
+    private setStart(value: boolean) {
+        this._isStart = value;
+    }
+
+    setStartPipe(startPipe: Pipe) {
+        this.addPipe(startPipe);
+        this.setStart(true);
     }
 
     reset() {
         this.removePipe();
         this.unblock();
         this.setActive(false);
+        this.setStart(false);
     }
 }

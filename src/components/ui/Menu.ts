@@ -35,7 +35,6 @@ export class Menu extends Container {
     async awaitStartClick() {
         await new Promise<void>((resolve) => {
             const onClick = () => {
-                console.log("!");
                 resolve();
             };
             this.button.onclick = onClick;

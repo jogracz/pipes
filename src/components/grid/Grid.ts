@@ -1,5 +1,6 @@
 import { Container } from "pixi.js";
 import { getRandomElement } from "../../utils";
+import { Pipe } from "../pipes";
 import { Cell } from "./Cell";
 
 interface GridConfig {
@@ -17,12 +18,11 @@ export class Grid extends Container {
         super();
         this.config = config;
 
-        this.initiate();
-        this.resetRandomBlockers();
+        this.populate();
     }
 
-    initiate() {
-        const padding = 10;
+    populate() {
+        const padding = 5;
         for (let i = 0; i < this.config.columnsCount; i++) {
             for (let j = 0; j < this.config.rowsCount; j++) {
                 const cell = new Cell({ gridColumn: i, gridRow: j });
@@ -48,20 +48,14 @@ export class Grid extends Container {
         }
     }
 
-    private resetRandomStart() {
-        const randomCell = getRandomElement(
+    private resetRandomStart(startPipe: Pipe) {
+        const randomCell: Cell = getRandomElement(
             this.allCells
-                .filter(this.getIsNotLastRow)
-                .filter(this.getIsNotBlocked)
+                .filter((cell: Cell) => this.getIsNotLastRow(cell))
+                .filter((cell: Cell) => this.getIsNotBlocked(cell))
         );
 
-        randomCell.setStart();
-    }
-
-    filterForStartCell(array: any[]) {
-        return array.filter(
-            (cell: Cell) => cell.config.gridRow !== this.config.rowsCount - 1
-        );
+        randomCell.setStartPipe(startPipe);
     }
 
     getIsNotLastRow(cell: Cell) {
@@ -74,7 +68,9 @@ export class Grid extends Container {
 
     activate() {
         this._isActive = true;
-        this.allCells.forEach((cell: Cell) => cell.setActive(!cell.isBlocked));
+        this.allCells.forEach((cell: Cell) =>
+            cell.setActive(!cell.isBlocked && !cell.hasPipe)
+        );
     }
 
     deactivate() {
@@ -82,8 +78,14 @@ export class Grid extends Container {
         this.allCells.forEach((cell: Cell) => cell.setActive(false));
     }
 
-    reset() {
+    reset(startPipe: Pipe) {
         this.resetRandomBlockers();
-        this.resetRandomStart();
+        this.resetRandomStart(startPipe);
+    }
+
+    relayout() {
+        this.scale.set(1.5);
+        this.x = -this.width / 2;
+        this.y = -this.height / 2;
     }
 }

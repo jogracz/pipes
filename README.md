@@ -30,6 +30,7 @@ link
 ## what could be added/improved:
 
 -   responsiveness,
+-   add pooling for pipe sprites,
 -   better cell store and access system,
 -   better game state system,
 -   better animations,

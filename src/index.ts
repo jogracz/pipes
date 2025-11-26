@@ -20,7 +20,7 @@ gsap.registerPlugin(PixiPlugin);
     const gameMediator = new GameMediator();
 
     pixiApp.stage.addChild(gameMediator.gameScene);
-    // window.addEventListener("resize", gameScene.relayout);
+    window.addEventListener("resize", () => gameMediator.gameScene.relayout());
 
     pixiApp.ticker.add((ticker: Ticker) => {
         gameMediator.update();

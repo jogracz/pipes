@@ -1,91 +1,109 @@
-import { Container } from "pixi.js";
-import { Pipe } from "./Pipe";
-import { RandomPipeGenerator } from "./RandomPipeGenerator";
+import {Container} from "pixi.js";
+import {Pipe} from "./Pipe";
+import {RandomPipeGenerator} from "./RandomPipeGenerator";
+import gsap from "gsap";
 
 interface PipeQueueConfig {
-    length: number;
+	length: number;
 }
 
 export class PipeQueue extends Container {
-    private _config: PipeQueueConfig;
-    private _randomPipeGenerator: RandomPipeGenerator;
-    private pipes: Pipe[] = [];
-    private _isActive = false;
+	private _config: PipeQueueConfig;
+	private _randomPipeGenerator: RandomPipeGenerator;
+	private pipes: Pipe[] = [];
+	private _isActive = false;
 
-    constructor(
-        config: PipeQueueConfig,
-        randomPipeGenerator: RandomPipeGenerator
-    ) {
-        super();
-        this._config = config;
-        this._randomPipeGenerator = randomPipeGenerator;
-        // this.eventMode = "static";
+	constructor(config: PipeQueueConfig, randomPipeGenerator: RandomPipeGenerator) {
+		super();
+		this._config = config;
+		this._randomPipeGenerator = randomPipeGenerator;
+		// this.eventMode = "static";
 
-        this.populate();
-    }
+		this.populate();
+	}
 
-    populate() {
-        for (let i = 0; i < this._config.length; i++) {
-            const pipe = this._randomPipeGenerator.generate();
-            pipe.y = i * this.getSpacing(pipe);
-            this.pipes.push(pipe);
-            this.addChild(pipe);
-        }
-    }
+	populate() {
+		for (let i = 0; i < this._config.length; i++) {
+			const pipe = this._randomPipeGenerator.generate();
+			pipe.y = i * this.getSpacing();
+			this.pipes.push(pipe);
+			this.addChild(pipe);
+		}
+	}
 
-    getSpacing(pipe: Pipe) {
-        const padding = 10;
-        return pipe.height + padding;
-    }
+	getSpacing() {
+		const padding = 10;
+		return Pipe.spriteHeight + padding;
+	}
 
-    getCurrentPipe(): Pipe {
-        const currentPipe = this.pipes.shift();
-        this.addNewPipe();
-        return currentPipe;
-    }
+	getCurrentPipe(): Pipe {
+		// if (this.pipes[0].isActive) {
+		const currentPipe = this.pipes.shift();
+		currentPipe.setActive(false);
+		currentPipe.y = 0;
+		this.addNewPipe();
+		return currentPipe;
+		// }
+	}
 
-    addNewPipe() {
-        const newPipe = this._randomPipeGenerator.generate();
-        newPipe.position.copyFrom(this.pipes[this.pipes.length - 1].position);
-        this.addChild(newPipe);
-        this.rearangePipes();
-        this.pipes.push(newPipe);
-    }
+	async addNewPipe() {
+		const newPipe = this._randomPipeGenerator.generate();
+		newPipe.y = this._config.length * this.getSpacing();
+		this.addChild(newPipe);
+		this.pipes.push(newPipe);
+		await this.rearangePipes();
+	}
 
-    rearangePipes() {
-        this.pipes.forEach((pipe: Pipe) => {
-            pipe.y = pipe.y - this.getSpacing(pipe);
-        });
-    }
+	async rearangePipes() {
+		this.deactivate();
+		await Promise.all(
+			this.pipes.map(async (pipe: Pipe) => {
+				const currentY = pipe.y;
+				return await gsap.to(pipe, {
+					y: currentY - this.getSpacing(),
+					duration: 0.3,
+				});
+			})
+		);
+		this.activate();
+	}
 
-    activate() {
-        this._isActive = true;
-        this.pipes[0].setActive(true);
-    }
+	activateCurrentPipe() {
+		this.pipes[0].setActive(true);
+	}
 
-    deactivate() {
-        this._isActive = false;
-        this.pipes.forEach((pipe: Pipe) => pipe.setActive(false));
-    }
+	activate() {
+		this._isActive = true;
+		this.activateCurrentPipe();
+	}
 
-    reset() {
-        // this.clean();
-        // this.populate();
-        // this.pipes.forEach((pipe: Pipe) => pipe.reset());
-        this.activate();
-    }
+	deactivate() {
+		this._isActive = false;
+		this.pipes.forEach((pipe: Pipe) => pipe.setActive(false));
+	}
 
-    clean() {
-        this.pipes.forEach((pipe: Pipe) => pipe.destroy());
-    }
+	get isActive() {
+		return this._isActive;
+	}
 
-    update() {
-        this.pipes.forEach((pipe: Pipe) => pipe.update());
-    }
+	reset() {
+		// this.clean();
+		// this.populate();
+		// this.pipes.forEach((pipe: Pipe) => pipe.reset());
+		this.activate();
+	}
 
-    relayout() {
-        this.scale.set(1.5);
-        this.x = -this.width;
-        this.y = -this.height / 2;
-    }
+	clean() {
+		this.pipes.forEach((pipe: Pipe) => pipe.destroy());
+	}
+
+	update() {
+		this.pipes.forEach((pipe: Pipe) => pipe.update());
+	}
+
+	relayout() {
+		this.scale.set(1.5);
+		this.x = -this.width;
+		this.y = -this.height / 2;
+	}
 }

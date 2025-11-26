@@ -2,7 +2,7 @@ import gsap from "gsap/all";
 import { Container, Graphics } from "pixi.js";
 import { Pipe } from "../pipes";
 
-interface CellConfig {
+export interface CellConfig {
     gridColumn: number;
     gridRow: number;
 }
@@ -27,8 +27,6 @@ export class Cell extends Container {
         this.addChild(this.background);
 
         this.eventMode = "static";
-        // this.on("pointerover", this.onHover);
-        // this.on("pointerout", this.onHoverEnd);
     }
 
     private async onHover() {
@@ -77,6 +75,10 @@ export class Cell extends Container {
         return !!this.pipe;
     }
 
+    get isActive() {
+        return this._isActive;
+    }
+
     block() {
         this._isBlocked = true;
         this.alpha = OPACITY_BLOCKED;
@@ -87,7 +89,7 @@ export class Cell extends Container {
         this.alpha = OPACITY_DEFAULT;
     }
 
-    private addPipe(pipe: Pipe) {
+    addPipe(pipe: Pipe) {
         this.pipe = pipe;
         this.pipe.visible = true;
         this.addChild(this.pipe);
@@ -99,22 +101,22 @@ export class Cell extends Container {
     }
 
     private addHoverAnimation() {
-        this.addEventListener("pointerover", () => this.onHover());
-        this.addEventListener("pointerout", () => this.onHoverEnd());
+        this.cursor = "pointer";
+        this.onpointerover = () => this.onHover();
+        this.onpointerout = () => this.onHoverEnd();
     }
 
     private removeHoverAnimation() {
-        this.removeEventListener("pointerover", () => this.onHover());
-        this.removeEventListener("pointerout", () => this.onHoverEnd());
+        this.cursor = "arrow";
+        this.onpointerover = null;
+        this.onpointerout = null;
     }
 
     setActive(value: boolean) {
         this._isActive = value;
         if (value) {
-            this.cursor = "pointer";
             this.addHoverAnimation();
         } else {
-            this.cursor = "arrow";
             this.removeHoverAnimation();
         }
     }
@@ -126,6 +128,26 @@ export class Cell extends Container {
     setStartPipe(startPipe: Pipe) {
         this.addPipe(startPipe);
         this.setStart(true);
+    }
+
+    async waitForMove(callback: (cell: Cell) => void) {
+        await new Promise<void>((resolve) => {
+            const onClick = () => {
+                resolve();
+                callback(this);
+            };
+            this.onclick = onClick;
+            this.cursor = "pointer";
+        });
+        this.onclick = null;
+        this.cursor = "arrow";
+    }
+
+    checkPositionMatch({ gridColumn, gridRow }: CellConfig) {
+        return (
+            this.config.gridColumn === gridColumn &&
+            this.config.gridRow === gridRow
+        );
     }
 
     reset() {

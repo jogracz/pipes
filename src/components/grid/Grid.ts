@@ -1,7 +1,7 @@
 import { Container } from "pixi.js";
 import { getRandomElement } from "../../utils";
 import { Pipe } from "../pipes";
-import { Cell } from "./Cell";
+import { Cell, CellConfig } from "./Cell";
 
 interface GridConfig {
     columnsCount: number;
@@ -13,6 +13,7 @@ export class Grid extends Container {
     private config: GridConfig;
     private allCells: Cell[] = [];
     private blockedCells: Cell[] = [];
+    private _startCell: Cell;
     private _isActive: boolean = false;
     constructor(config: GridConfig) {
         super();
@@ -49,13 +50,17 @@ export class Grid extends Container {
     }
 
     private resetRandomStart(startPipe: Pipe) {
-        const randomCell: Cell = getRandomElement(
+        this._startCell = getRandomElement(
             this.allCells
                 .filter((cell: Cell) => this.getIsNotLastRow(cell))
                 .filter((cell: Cell) => this.getIsNotBlocked(cell))
         );
 
-        randomCell.setStartPipe(startPipe);
+        this._startCell.setStartPipe(startPipe);
+    }
+
+    get startCell() {
+        return this._startCell;
     }
 
     getIsNotLastRow(cell: Cell) {
@@ -65,6 +70,12 @@ export class Grid extends Container {
     getIsNotBlocked(cell: Cell) {
         return !cell.isBlocked;
     }
+
+    getHasValidConnection(cell1: Cell, cell2: Cell) {}
+
+    //     getConnectionDirections(cell:Cell) {
+    // cell.pipe.
+    //     }
 
     activate() {
         this._isActive = true;
@@ -76,6 +87,81 @@ export class Grid extends Container {
     deactivate() {
         this._isActive = false;
         this.allCells.forEach((cell: Cell) => cell.setActive(false));
+    }
+
+    getActiveCells() {
+        return this.allCells.filter((cell: Cell) => cell.isActive);
+    }
+
+    async waitForMove(callback: (cell: Cell) => void) {
+        await Promise.any(
+            this.getActiveCells().map(async (cell: Cell) =>
+                cell.waitForMove(callback)
+            )
+        );
+    }
+
+    private getNeighbours(cell: Cell) {
+        const gridColumn = cell.config.gridColumn;
+        const gridRow = cell.config.gridRow;
+        // const columnsCount = this.config.columnsCount; //9
+        // const rowsCount = this.config.rowsCount; //7
+
+        const neighbours = {
+            // NORTH / TOP
+            NN: this.findCell({ gridColumn, gridRow: gridRow - 1 }),
+            // SOUTH / DOWN
+            SS: this.findCell({ gridColumn, gridRow: gridRow + 1 }),
+            // EAST / RIGHT
+            EE: this.findCell({ gridColumn: gridColumn + 1, gridRow }),
+            // WEST / LEFT
+            WW: this.findCell({ gridColumn: gridColumn - 1, gridRow }),
+
+            // // NORTH-EAST / TOP-RIGHT
+            // NE: this.findCell({
+            //     gridColumn: gridColumn + 1,
+            //     gridRow: gridRow - 1,
+            // }),
+            // // NORTH-WEST / TOP-LEFT
+            // NW: this.findCell({
+            //     gridColumn: gridColumn - 1,
+            //     gridRow: gridRow - 1,
+            // }),
+            // // SOUTH-EAST / DOWN-RIGHT
+            // SE: this.findCell({
+            //     gridColumn: gridColumn + 1,
+            //     gridRow: gridRow + 1,
+            // }),
+            // // SOUTH-WEST / DOWN-LEST
+            // SW: this.findCell({
+            //     gridColumn: gridColumn - 1,
+            //     gridRow: gridRow + 1,
+            // }),
+        };
+        console.log(neighbours);
+        return neighbours;
+    }
+
+    getValidNeighbours(cell: Cell) {
+        const neighbours = Object.values(this.getNeighbours(cell));
+
+        return neighbours.filter((cell: Cell) => this.getIsNotBlocked(cell));
+        // .filter();
+    }
+
+    findCell({ gridColumn, gridRow }: CellConfig) {
+        if (
+            gridColumn < 0 ||
+            gridRow < 0 ||
+            gridColumn >= this.config.columnsCount ||
+            gridRow >= this.config.rowsCount
+        ) {
+            return null;
+        }
+
+        return this.allCells.find((cell: Cell) =>
+            cell.checkPositionMatch({ gridColumn, gridRow })
+        );
     }
 
     reset(startPipe: Pipe) {

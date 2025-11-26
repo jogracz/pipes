@@ -1,8 +1,17 @@
 import { Container, Sprite, Texture } from "pixi.js";
 
+export enum DIRECTION {
+    NN,
+    EE,
+    SS,
+    WW,
+}
+
+export const ROTATIONS = [0, 90, 180, 270];
 interface PipeConfig {
     texture: Texture;
     rotation: number;
+    defaultDirections: DIRECTION[];
 }
 
 export class Pipe extends Container {
@@ -50,6 +59,21 @@ export class Pipe extends Container {
                 this._isGrowing = true;
             }
         }
+    }
+
+    getConnectionDirections() {
+        return this._config.defaultDirections.map((direction: DIRECTION) =>
+            this.getDirectionForRotation(direction, this._config.rotation)
+        );
+    }
+
+    getDirectionForRotation(direction: DIRECTION, rotation: number) {
+        if (rotation === 0) {
+            return direction;
+        }
+        // or DIRECTION[direction+ROTATIONS.indexOf(rotation) +1]
+        console.log(DIRECTION[direction + rotation / 90]);
+        return DIRECTION[direction + rotation / 90];
     }
 
     update() {

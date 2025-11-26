@@ -1,4 +1,4 @@
-import { Container, Sprite, Texture } from "pixi.js";
+import { Container } from "pixi.js";
 import { Pipe } from "./Pipe";
 import { RandomPipeGenerator } from "./RandomPipeGenerator";
 
@@ -21,27 +21,42 @@ export class PipeQueue extends Container {
         this._randomPipeGenerator = randomPipeGenerator;
         // this.eventMode = "static";
 
-        this.initiate();
+        this.populate();
     }
 
-    initiate() {
-        const padding = 10;
+    populate() {
         for (let i = 0; i < this._config.length; i++) {
             const pipe = this._randomPipeGenerator.generate();
-            pipe.y = i * (pipe.height + padding);
+            pipe.y = i * this.getSpacing(pipe);
             this.pipes.push(pipe);
             this.addChild(pipe);
         }
     }
 
-    // setActive(value: boolean) {
-    //     this._isActive = value;
-    //     if (value) {
-    //         this.cursor = "pointer";
-    //     } else {
-    //         this.cursor = "arrow";
-    //     }
-    // }
+    getSpacing(pipe: Pipe) {
+        const padding = 10;
+        return pipe.height + padding;
+    }
+
+    getCurrentPipe(): Pipe {
+        const currentPipe = this.pipes.shift();
+        this.addNewPipe();
+        return currentPipe;
+    }
+
+    addNewPipe() {
+        const newPipe = this._randomPipeGenerator.generate();
+        newPipe.position.copyFrom(this.pipes[this.pipes.length - 1].position);
+        this.addChild(newPipe);
+        this.rearangePipes();
+        this.pipes.push(newPipe);
+    }
+
+    rearangePipes() {
+        this.pipes.forEach((pipe: Pipe) => {
+            pipe.y = pipe.y - this.getSpacing(pipe);
+        });
+    }
 
     activate() {
         this._isActive = true;
@@ -54,10 +69,23 @@ export class PipeQueue extends Container {
     }
 
     reset() {
-        this.pipes.forEach((pipe: Pipe) => pipe.reset());
+        // this.clean();
+        // this.populate();
+        // this.pipes.forEach((pipe: Pipe) => pipe.reset());
+        this.activate();
+    }
+
+    clean() {
+        this.pipes.forEach((pipe: Pipe) => pipe.destroy());
     }
 
     update() {
         this.pipes.forEach((pipe: Pipe) => pipe.update());
+    }
+
+    relayout() {
+        this.scale.set(1.5);
+        this.x = -this.width;
+        this.y = -this.height / 2;
     }
 }

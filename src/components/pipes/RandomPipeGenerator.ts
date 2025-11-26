@@ -2,6 +2,7 @@ import { Container, PipelineSystem, Sprite, Spritesheet } from "pixi.js";
 import { pipesAtlas } from "../../assets";
 import { getRandomElement } from "../../utils";
 import { Pipe } from "./";
+import { ROTATIONS } from "./Pipe";
 
 export const PIPE_TEXTURES = {
     straight: "",
@@ -25,22 +26,15 @@ export class RandomPipeGenerator {
     }
 
     generate(): Pipe {
-        const allRotations = [0, 90, 180, 360];
-        // const allTypes = Object.keys(PIPE_TYPES);
         const { straight, cross, curved } = this._pipesSpritesheet.textures;
         const allTextures = [straight, cross, curved];
 
-        // const randomtype = getRandomElement(allTypes);
         const randomTexture = getRandomElement(allTextures);
-        const randomRotation = getRandomElement(allRotations);
+        const randomRotation = getRandomElement(ROTATIONS);
         return new Pipe({
             texture: randomTexture,
             rotation: randomRotation,
+            defaultDirections: [],
         });
     }
-
-    // private generateStraightPipe() {
-    //     const pipe = new Pipe();
-    //     return pipe;
-    // }
 }

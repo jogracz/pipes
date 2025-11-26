@@ -1,11 +1,21 @@
 import { Assets, Container, Spritesheet, Text, TextStyle } from "pixi.js";
 import { pipesAtlas, pipes_spritesheet, menu, button } from "../assets";
-import { Grid } from "./grid";
-import { RandomPipeGenerator, PipeQueue, Pipe } from "./pipes";
+import { Cell, CellConfig, Grid } from "./grid";
+import { RandomPipeGenerator, PipeQueue, Pipe, DIRECTION } from "./pipes";
 import { Menu } from "./ui";
 
 const PIPE_QUEUE_LENGHT = 7;
+enum PIPE_TYPE {
+    STRAIGHT,
+    CURVED,
+    CROSS,
+}
 
+const PIPE_DIRECTIONS = {
+    [PIPE_TYPE.STRAIGHT]: [DIRECTION.NN, DIRECTION.SS],
+    [PIPE_TYPE.CURVED]: [DIRECTION.SS, DIRECTION.EE],
+    [PIPE_TYPE.CROSS]: [DIRECTION.NN, DIRECTION.SS, DIRECTION.EE, DIRECTION.WW],
+};
 export class GameScene extends Container {
     private _isLoaded = false;
     private _loader: Text;
@@ -99,6 +109,7 @@ export class GameScene extends Container {
         this.startPipe = new Pipe({
             texture: this.pipesSpritesheet.textures.start,
             rotation: 0,
+            defaultDirections: PIPE_DIRECTIONS[PIPE_TYPE.STRAIGHT],
         });
         this.startPipe.visible = false;
     }
@@ -128,6 +139,31 @@ export class GameScene extends Container {
             grid: this.grid,
             pipeQueue: this.pipeQueue,
         };
+    }
+
+    async waitForMove(callback: (cel: Cell) => void) {
+        await this.grid.waitForMove(callback);
+    }
+
+    getCurrentPipe(): Pipe {
+        return this.pipeQueue.getCurrentPipe();
+    }
+
+    getStartCell(): Cell {
+        return this.grid.startCell;
+    }
+
+    getActiveCells() {
+        return this.grid.getActiveCells();
+    }
+
+    hasActiveCells() {
+        return this.getActiveCells().length > 50;
+    }
+
+    getValidNeighbours(cell: Cell) {
+        console.log(this.grid.getValidNeighbours(cell));
+        return this.grid.getValidNeighbours(cell);
     }
 
     async update() {

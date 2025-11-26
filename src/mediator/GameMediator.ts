@@ -1,164 +1,166 @@
 import gsap from "gsap/all";
-import { GameScene } from "../components";
-import { Cell, CellConfig } from "../components/grid";
-import { Pipe } from "../components/pipes";
+import {GameScene} from "../components";
+import {Cell, CellConfig} from "../components/grid";
+import {Pipe} from "../components/pipes";
 
 export const GAME_STATE = {
-    LOADING: "LOADING",
-    MAIN_MENU: "MAIN_MENU",
-    GAME_STARTED: {
-        AWAITING_INPUT: "AWAITING_INPUT",
-        EVALUATING: "EVALUATING",
-    },
-    GAME_OVER: {
-        EVALUATING: "EVALUATING",
-        RESULT: "RESULT",
-        AWAITING_INPUT: "AWAITING_INPUT", //START AGAIN?
-    },
+	LOADING: "LOADING",
+	MAIN_MENU: "MAIN_MENU",
+	GAME_STARTED: {
+		AWAITING_INPUT: "AWAITING_INPUT",
+		EVALUATING: "EVALUATING",
+	},
+	GAME_OVER: {
+		EVALUATING: "EVALUATING",
+		RESULT: "RESULT",
+		AWAITING_INPUT: "AWAITING_INPUT", //START AGAIN?
+	},
 };
 
 type Result = {
-    pathLength: number;
-    date: Date;
+	pathLength: number;
+	date: Date;
 };
 export class GameMediator {
-    private _gameScene: GameScene;
-    private _hasMoves: boolean = true;
-    private _isEvaluating: boolean = true;
-    private _currentPipe: Pipe;
-    private _results: Result[] = [];
-    private currectPathLength: number = 0;
-    // private _startCell: Cell;
+	private _gameScene: GameScene;
+	private _hasMoves: boolean = true;
+	private _isEvaluating: boolean = true;
+	private _currentPipe: Pipe;
+	private _results: Result[] = [];
+	private currectPathLength: number = 0;
+	// private _startCell: Cell;
 
-    constructor() {
-        this._gameScene = new GameScene();
-    }
+	constructor() {
+		this._gameScene = new GameScene();
+	}
 
-    // LOADING: "LOADING",
-    async loadAssets() {
-        await this.gameScene.load();
-    }
+	// LOADING: "LOADING",
+	async loadAssets() {
+		await this.gameScene.load();
+	}
 
-    async startGame() {
-        // MAIN_MENU: "MAIN_MENU",
-        await this.gameScene.components.menu.awaitStartClick();
+	async startGame() {
+		// MAIN_MENU: "MAIN_MENU",
+		await this.gameScene.components.menu.awaitStartClick();
 
-        // PREPARE NEW BOARD
-        this.resetBoard();
-        this.gameScene.showBoard();
-        await this.gameScene.components.menu.hide();
-        this.gameScene.activateBoard();
+		// PREPARE NEW BOARD
+		this.resetBoard();
+		this.gameScene.showBoard();
+		await this.gameScene.components.menu.hide();
+		this.gameScene.activateBoard();
 
-        // AWAITING_INPUT: "AWAITING_INPUT",
-        console.log("Mainloop start");
-        await this.mainLoop();
-        console.log("Mainloop stop");
+		// AWAITING_INPUT: "AWAITING_INPUT",
+		console.log("Mainloop start");
+		await this.mainLoop();
+		console.log("Mainloop stop");
 
-        // EVALUATING: "EVALUATING",
-        console.log("Evaluating start");
-        await this.pathFindingLoop(this.gameScene.getStartCell());
-        console.log("Evaluating stop");
+		// EVALUATING: "EVALUATING",
+		console.log("Evaluating start");
+		await this.pathFindingLoop(this.gameScene.getStartCell());
+		console.log("Evaluating stop");
 
-        // RESULT: "RESULT",
-        this.handleResult(this.currectPathLength);
-        // show result screen
+		// RESULT: "RESULT",
+		this.handleResult(this.currectPathLength);
+		// show result screen
 
-        // AWAITING_INPUT: "AWAITING_INPUT", //START AGAIN?
-    }
+		// AWAITING_INPUT: "AWAITING_INPUT", //START AGAIN?
+	}
 
-    private async mainLoop() {
-        while (this._hasMoves) {
-            // await new Promise((resolve) => gsap.delayedCall(1, resolve));
-            await this.waitForMove();
-            this.checkHasMoves();
-        }
-    }
+	private async mainLoop() {
+		while (this._hasMoves) {
+			// await new Promise((resolve) => gsap.delayedCall(1, resolve));
+			await this.waitForMove();
+			this.checkHasMoves();
+		}
+	}
 
-    private async pathFindingLoop(startCell: Cell) {
-        let currentCell = startCell;
-        while (this._isEvaluating) {
-            const hasPath = this.checkHasPath(currentCell);
-            console.log("hasPath", hasPath);
-            await new Promise((resolve) => gsap.delayedCall(1, resolve));
-            if (hasPath) {
-                // change currentCell //this.checkHasPath change to finNextCell
-                this.currectPathLength++;
-                // this.pathFindingLoop(currentCell)
-            } else {
-                this._isEvaluating = false;
-            }
-        }
-    }
+	private async pathFindingLoop(startCell: Cell) {
+		let currentCell = startCell;
+		while (this._isEvaluating) {
+			const hasPath = this.checkHasPath(currentCell);
+			console.log("hasPath", hasPath);
+			await new Promise((resolve) => gsap.delayedCall(1, resolve));
+			if (hasPath) {
+				// change currentCell //this.checkHasPath change to finNextCell
+				this.currectPathLength++;
+				// this.pathFindingLoop(currentCell)
+			} else {
+				this._isEvaluating = false;
+			}
+		}
+	}
 
-    checkHasMoves() {
-        if (!this.gameScene.hasActiveCells()) {
-            this._hasMoves = false;
-        }
-    }
+	checkHasMoves() {
+		if (!this.gameScene.hasActiveCells()) {
+			this._hasMoves = false;
+		}
+	}
 
-    checkHasPath(currentCell: Cell) {
-        const validNeighbours = this.gameScene.getValidNeighbours(currentCell);
-        console.log("VALID NEIGHBOURS", validNeighbours);
-        if (validNeighbours.length === 0) return false;
-        return true;
-    }
+	checkHasPath(currentCell: Cell) {
+		const validNeighbours = this.gameScene.getValidNeighbours(currentCell);
+		console.log("VALID NEIGHBOURS", validNeighbours);
+		if (validNeighbours.length === 0) return false;
+		return true;
+	}
 
-    handleResult(pathLength: number) {
-        console.log("max win", this.checkIsMaxResult(pathLength));
+	handleResult(pathLength: number) {
+		console.log("max win", this.checkIsMaxResult(pathLength));
 
-        this.saveResult(pathLength);
-    }
+		this.saveResult(pathLength);
+	}
 
-    saveResult(pathLength: number) {
-        console.log("pathLength", pathLength);
-        const date = new Date();
-        this._results.push({
-            pathLength,
-            date,
-        });
-    }
+	saveResult(pathLength: number) {
+		console.log("pathLength", pathLength);
+		const date = new Date();
+		this._results.push({
+			pathLength,
+			date,
+		});
+	}
 
-    checkIsMaxResult(pathLength: number) {
-        if (pathLength === 0) return false;
-        if (this._results.length === 0) return true;
+	checkIsMaxResult(pathLength: number) {
+		if (pathLength === 0) return false;
+		if (this._results.length === 0) return true;
 
-        this._results.forEach((result: Result) => {
-            if (result.pathLength < pathLength) {
-                return true;
-            }
-        });
-        return false;
-    }
+		this._results.forEach((result: Result) => {
+			if (result.pathLength < pathLength) {
+				return true;
+			}
+		});
+		return false;
+	}
 
-    increasePathLength() {
-        this.currectPathLength++;
-    }
+	increasePathLength() {
+		this.currectPathLength++;
+	}
 
-    async waitForMove() {
-        await this.gameScene.waitForMove((cell: Cell) => this.handleMove(cell));
-    }
+	async waitForMove() {
+		await this.gameScene.waitForMove((cell: Cell) => this.handleMove(cell));
+	}
 
-    async handleMove(cell: Cell) {
-        console.log(cell.config);
-        const currentPipe = this.gameScene.getCurrentPipe();
-        cell.addPipe(currentPipe);
-    }
+	async handleMove(cell: Cell) {
+		// if (this.gameScene.components.pipeQueue.isActive) {
+		console.log(cell.config);
+		const currentPipe = this.gameScene.getCurrentPipe();
+		cell.addPipe(currentPipe);
+		// }
+	}
 
-    // async evaluate() {
-    //     this.gameScene.components.grid.getNeighbours(
-    //         this.gameScene.getStartCell()
-    //     );
-    // }
+	// async evaluate() {
+	//     this.gameScene.components.grid.getNeighbours(
+	//         this.gameScene.getStartCell()
+	//     );
+	// }
 
-    get gameScene() {
-        return this._gameScene;
-    }
+	get gameScene() {
+		return this._gameScene;
+	}
 
-    update() {
-        this._gameScene.update();
-    }
+	update() {
+		this._gameScene.update();
+	}
 
-    resetBoard() {
-        this.gameScene.reset();
-    }
+	resetBoard() {
+		this.gameScene.reset();
+	}
 }

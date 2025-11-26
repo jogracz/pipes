@@ -1,6 +1,6 @@
 import {Container} from "pixi.js";
 import {getRandomElement} from "../../utils";
-import {Pipe} from "../pipes";
+import {DIRECTION, Pipe} from "../pipes";
 import {Cell, CellConfig} from "./Cell";
 
 interface GridConfig {
@@ -9,6 +9,10 @@ interface GridConfig {
 	blockersCount: number;
 }
 
+type Neighbour = {
+	direction: DIRECTION;
+	cell?: Cell;
+};
 export class Grid extends Container {
 	private config: GridConfig;
 	private allCells: Cell[] = [];
@@ -71,7 +75,10 @@ export class Grid extends Container {
 		return !cell.isBlocked;
 	}
 
-	getHasValidConnection(cell1: Cell, cell2: Cell) {}
+	getHasValidConnection(cell1: Cell, cell2: Cell) {
+		cell1.pipe.getConnectionDirections();
+		cell2.pipe.getConnectionDirections();
+	}
 
 	//     getConnectionDirections(cell:Cell) {
 	// cell.pipe.
@@ -97,54 +104,49 @@ export class Grid extends Container {
 		);
 	}
 
-	private getNeighbours(cell: Cell) {
+	private getAllNeighbours(cell: Cell): Neighbour[] {
 		const gridColumn = cell.config.gridColumn;
 		const gridRow = cell.config.gridRow;
 		// const columnsCount = this.config.columnsCount; //9
 		// const rowsCount = this.config.rowsCount; //7
+		// const possibleDirections = cell.pipe.getConnectionDirections();
 
-		const neighbours = {
-			// NORTH / TOP
-			NN: this.findCell({gridColumn, gridRow: gridRow - 1}),
-			// SOUTH / DOWN
-			SS: this.findCell({gridColumn, gridRow: gridRow + 1}),
-			// EAST / RIGHT
-			EE: this.findCell({gridColumn: gridColumn + 1, gridRow}),
-			// WEST / LEFT
-			WW: this.findCell({gridColumn: gridColumn - 1, gridRow}),
-
-			// // NORTH-EAST / TOP-RIGHT
-			// NE: this.findCell({
-			//     gridColumn: gridColumn + 1,
-			//     gridRow: gridRow - 1,
-			// }),
-			// // NORTH-WEST / TOP-LEFT
-			// NW: this.findCell({
-			//     gridColumn: gridColumn - 1,
-			//     gridRow: gridRow - 1,
-			// }),
-			// // SOUTH-EAST / DOWN-RIGHT
-			// SE: this.findCell({
-			//     gridColumn: gridColumn + 1,
-			//     gridRow: gridRow + 1,
-			// }),
-			// // SOUTH-WEST / DOWN-LEST
-			// SW: this.findCell({
-			//     gridColumn: gridColumn - 1,
-			//     gridRow: gridRow + 1,
-			// }),
-		};
+		const neighbours: Neighbour[] = [
+			{
+				// NORTH / TOP
+				direction: DIRECTION.NN,
+				cell: this.findCell({gridColumn, gridRow: gridRow - 1}),
+			},
+			{
+				// EAST / RIGHT
+				direction: DIRECTION.EE,
+				cell: this.findCell({gridColumn: gridColumn + 1, gridRow}),
+			},
+			{
+				// SOUTH / DOWN
+				direction: DIRECTION.SS,
+				cell: this.findCell({gridColumn, gridRow: gridRow + 1}),
+			},
+			{
+				// WEST / LEFT
+				direction: DIRECTION.WW,
+				cell: this.findCell({gridColumn: gridColumn - 1, gridRow}),
+			},
+		];
 		console.log(neighbours);
+
 		return neighbours;
 	}
 
 	getValidNeighbours(cell: Cell) {
-		const neighbours = Object.values(this.getNeighbours(cell));
+		const neighbours = this.getAllNeighbours(cell);
+		const possibleDirections = cell.pipe.getConnectionDirections();
 
 		return neighbours
-			.filter((cell: Cell) => !!cell)
-			.filter((cell: Cell) => !cell.isBlocked)
-			.filter((cell: Cell) => cell.hasPipe);
+			.filter((neighbour: Neighbour) => !!neighbour.cell)
+			.filter((neighbour: Neighbour) => !neighbour.cell.isBlocked)
+			.filter((neighbour: Neighbour) => neighbour.cell.hasPipe)
+			.filter((neighbour: Neighbour) => possibleDirections.includes(neighbour.direction));
 		// .filter().canconnect()
 	}
 

@@ -77,11 +77,12 @@ export class GameMediator {
 	private async pathFindingLoop(startCell: Cell) {
 		let currentCell = startCell;
 		while (this._isEvaluating) {
-			const hasPath = this.checkHasPath(currentCell);
-			console.log("hasPath", hasPath);
+			const nextCell = this.getNextCell(currentCell);
+			console.log("hasPath", nextCell);
 			await new Promise((resolve) => gsap.delayedCall(1, resolve));
-			if (hasPath) {
+			if (nextCell) {
 				// change currentCell //this.checkHasPath change to finNextCell
+				// currentCell = nextCell;
 				this.currectPathLength++;
 				// this.pathFindingLoop(currentCell)
 			} else {
@@ -96,11 +97,11 @@ export class GameMediator {
 		}
 	}
 
-	checkHasPath(currentCell: Cell) {
+	getNextCell(currentCell: Cell) {
 		const validNeighbours = this.gameScene.getValidNeighbours(currentCell);
 		console.log("VALID NEIGHBOURS", validNeighbours);
-		if (validNeighbours.length === 0) return false;
-		return true;
+		if (validNeighbours.length === 0) return null;
+		return validNeighbours[0].cell; //forEach
 	}
 
 	handleResult(pathLength: number) {

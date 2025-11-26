@@ -94,8 +94,8 @@ export class Cell extends Container {
 		this.pipe.visible = true;
 		this.background.addChild(this.pipe);
 		this.pipe.position.set(0);
-		console.log("this.position.y", this.position.y);
-		console.log("this.background.y", this.background.y);
+		// console.log("this.position.y", this.position.y);
+		// console.log("this.background.y", this.background.y);
 	}
 
 	removePipe() {

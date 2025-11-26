@@ -162,7 +162,7 @@ export class GameScene extends Container {
     }
 
     getValidNeighbours(cell: Cell) {
-        console.log(this.grid.getValidNeighbours(cell));
+        console.log("this.grid.getValidNeighbours(cell)");
         return this.grid.getValidNeighbours(cell);
     }
 

@@ -16,11 +16,18 @@ export const GAME_STATE = {
         AWAITING_INPUT: "AWAITING_INPUT", //START AGAIN?
     },
 };
+
+type Result = {
+    pathLength: number;
+    date: Date;
+};
 export class GameMediator {
     private _gameScene: GameScene;
     private _hasMoves: boolean = true;
     private _isEvaluating: boolean = true;
     private _currentPipe: Pipe;
+    private _results: Result[] = [];
+    private currectPathLength: number = 0;
     // private _startCell: Cell;
 
     constructor() {
@@ -41,16 +48,22 @@ export class GameMediator {
         this.gameScene.showBoard();
         await this.gameScene.components.menu.hide();
         this.gameScene.activateBoard();
-        console.log("Mainloop start");
 
         // AWAITING_INPUT: "AWAITING_INPUT",
+        console.log("Mainloop start");
         await this.mainLoop();
-
         console.log("Mainloop stop");
+
+        // EVALUATING: "EVALUATING",
         console.log("Evaluating start");
         await this.pathFindingLoop(this.gameScene.getStartCell());
         console.log("Evaluating stop");
-        // EVALUATING: "EVALUATING",
+
+        // RESULT: "RESULT",
+        this.handleResult(this.currectPathLength);
+        // show result screen
+
+        // AWAITING_INPUT: "AWAITING_INPUT", //START AGAIN?
     }
 
     private async mainLoop() {
@@ -64,9 +77,16 @@ export class GameMediator {
     private async pathFindingLoop(startCell: Cell) {
         let currentCell = startCell;
         while (this._isEvaluating) {
-            this.checkHasPath(startCell);
-            // await new Promise((resolve) => gsap.delayedCall(1, resolve));
-            await this.waitForMove();
+            const hasPath = this.checkHasPath(currentCell);
+            console.log("hasPath", hasPath);
+            await new Promise((resolve) => gsap.delayedCall(1, resolve));
+            if (hasPath) {
+                // change currentCell //this.checkHasPath change to finNextCell
+                this.currectPathLength++;
+                // this.pathFindingLoop(currentCell)
+            } else {
+                this._isEvaluating = false;
+            }
         }
     }
 
@@ -78,17 +98,44 @@ export class GameMediator {
 
     checkHasPath(currentCell: Cell) {
         const validNeighbours = this.gameScene.getValidNeighbours(currentCell);
+        console.log("VALID NEIGHBOURS", validNeighbours);
         if (validNeighbours.length === 0) return false;
+        return true;
+    }
 
-        // if (!this.gameScene.hasActiveCells()) {
-        //     this._hasMoves = false;
-        // }
+    handleResult(pathLength: number) {
+        console.log("max win", this.checkIsMaxResult(pathLength));
+
+        this.saveResult(pathLength);
+    }
+
+    saveResult(pathLength: number) {
+        console.log("pathLength", pathLength);
+        const date = new Date();
+        this._results.push({
+            pathLength,
+            date,
+        });
+    }
+
+    checkIsMaxResult(pathLength: number) {
+        if (pathLength === 0) return false;
+        if (this._results.length === 0) return true;
+
+        this._results.forEach((result: Result) => {
+            if (result.pathLength < pathLength) {
+                return true;
+            }
+        });
+        return false;
+    }
+
+    increasePathLength() {
+        this.currectPathLength++;
     }
 
     async waitForMove() {
-        console.log(1);
         await this.gameScene.waitForMove((cell: Cell) => this.handleMove(cell));
-        console.log(2);
     }
 
     async handleMove(cell: Cell) {

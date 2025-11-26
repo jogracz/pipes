@@ -145,8 +145,11 @@ export class Grid extends Container {
     getValidNeighbours(cell: Cell) {
         const neighbours = Object.values(this.getNeighbours(cell));
 
-        return neighbours.filter((cell: Cell) => this.getIsNotBlocked(cell));
-        // .filter();
+        return neighbours
+            .filter((cell: Cell) => !!cell)
+            .filter((cell: Cell) => !cell.isBlocked)
+            .filter((cell: Cell) => cell.hasPipe);
+        // .filter().canconnect()
     }
 
     findCell({ gridColumn, gridRow }: CellConfig) {

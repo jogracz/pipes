@@ -34,13 +34,14 @@ export interface Config {
 }
 
 export class GameMediator {
-	private _config: any;
+	private _config: Config;
 	private _gameScene: GameScene;
 	private _hasMoves: boolean = true;
 	private _isEvaluating: boolean = true;
 	private _currentPipe: Pipe;
 	private _results: Result[] = [];
 	private currectPathLength: number = 0;
+	private _timerInterval: any;
 	// private _startCell: Cell;
 
 	constructor(config: Config) {
@@ -65,16 +66,17 @@ export class GameMediator {
 
 		// AWAITING_INPUT: "AWAITING_INPUT",
 		console.log("Mainloop start");
+		this.startTimer();
 		await this.mainLoop();
 		console.log("Mainloop stop");
 
 		// EVALUATING: "EVALUATING",
 		console.log("Evaluating start");
-		await this.pathFindingLoop(this.gameScene.getStartCell());
-		console.log("Evaluating stop");
+		// await this.pathFindingLoop(this.gameScene.getStartCell());
+		// console.log("Evaluating stop");
 
 		// RESULT: "RESULT",
-		this.handleResult(this.currectPathLength);
+		// this.handleResult(this.currectPathLength);
 		// show result screen
 
 		// AWAITING_INPUT: "AWAITING_INPUT", //START AGAIN?
@@ -104,6 +106,24 @@ export class GameMediator {
 				this._isEvaluating = false;
 			}
 		}
+	}
+
+	startTimer() {
+		const intervalDelay = 100;
+		this._timerInterval = setInterval(() => this.updateTimer(intervalDelay), intervalDelay);
+	}
+
+	updateTimer(intervalDelay: number) {
+		this.gameScene.components.timer.updateTime(
+			intervalDelay,
+			async () => await this.stopTimer() //await?
+		);
+	}
+
+	async stopTimer() {
+		clearInterval(this._timerInterval);
+		await this.pathFindingLoop(this.gameScene.getStartCell());
+		this._timerInterval = null;
 	}
 
 	checkHasMoves() {

@@ -2,7 +2,7 @@ import {Assets, Container, Spritesheet, Text, TextStyle} from "pixi.js";
 import {pipesAtlas, pipes_spritesheet, menu, button} from "../assets";
 import {Cell, CellConfig, Grid} from "./grid";
 import {RandomPipeGenerator, PipeQueue, Pipe, DIRECTION} from "./pipes";
-import {Menu} from "./ui";
+import {Menu, Timer} from "./ui";
 import {Config} from "../mediator";
 
 const PIPE_QUEUE_LENGHT = 7;
@@ -22,6 +22,7 @@ export class GameScene extends Container {
 	private _isLoaded = false;
 	private _loader: Text;
 	private menu: Menu;
+	private timer: Timer;
 	private pipesSpritesheet: Spritesheet<typeof pipesAtlas>;
 	private pipeQueue: PipeQueue;
 	private grid: Grid;
@@ -73,6 +74,7 @@ export class GameScene extends Container {
 
 	mountComponents() {
 		this.mountMenu();
+		this.mountTimer();
 		this.mountPipeQueue();
 		this.mountGrid();
 		this.mountStartPipe();
@@ -112,6 +114,13 @@ export class GameScene extends Container {
 		this.addChild(this.menu);
 	}
 
+	mountTimer() {
+		this.timer = new Timer({defaultValue: this._config.waterStartDelayinMs});
+		this.timer.x = 290;
+		this.timer.y = -300;
+		this.addChild(this.timer);
+	}
+
 	get isLoaded() {
 		return this._isLoaded;
 	}
@@ -131,6 +140,7 @@ export class GameScene extends Container {
 			menu: this.menu,
 			grid: this.grid,
 			pipeQueue: this.pipeQueue,
+			timer: this.timer,
 		};
 	}
 

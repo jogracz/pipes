@@ -146,6 +146,11 @@ export class Cell extends Container {
 		this.cursor = "arrow";
 	}
 
+	async playWaterFlow() {
+		if (!this.pipe) return;
+		this.pipe.playWaterFlow();
+	}
+
 	checkPositionMatch({gridColumn, gridRow}: CellConfig) {
 		return this.config.gridColumn === gridColumn && this.config.gridRow === gridRow;
 	}

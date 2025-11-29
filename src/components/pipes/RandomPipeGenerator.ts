@@ -28,30 +28,29 @@ export class RandomPipeGenerator {
 		this.pipeDictionary = {
 			[PIPE_TYPES.STRAIGHT]: {
 				texture: this._pipesSpritesheet.textures.straight,
+				textureFilled: this._pipesSpritesheet.textures.straightFilled,
 				defaultDirections: [DIRECTION.NN, DIRECTION.SS],
 			},
 			[PIPE_TYPES.CURVED]: {
 				texture: this._pipesSpritesheet.textures.curved,
+				textureFilled: this._pipesSpritesheet.textures.curvedFilled,
 				defaultDirections: [DIRECTION.EE, DIRECTION.SS],
 			},
 			[PIPE_TYPES.CROSS]: {
 				texture: this._pipesSpritesheet.textures.cross,
+				textureFilled: this._pipesSpritesheet.textures.crossFilled,
 				defaultDirections: [DIRECTION.NN, DIRECTION.EE, DIRECTION.SS, DIRECTION.WW],
 			},
 		};
 	}
 
 	generate(): Pipe {
-		const {straight, cross, curved} = this._pipesSpritesheet.textures;
-		const allTextures = [straight, cross, curved];
-
-		const randomTexture = getRandomElement(allTextures);
 		const randomType = getRandomElement(Object.keys(PIPE_TYPES));
-		console.log("randomType", randomType);
 		const randomRotation = getRandomElement(ROTATIONS);
 
 		return new Pipe({
 			texture: this.pipeDictionary[randomType].texture,
+			textureFilled: this.pipeDictionary[randomType].textureFilled,
 			rotation: randomRotation,
 			defaultDirections: this.pipeDictionary[randomType].defaultDirections,
 		});

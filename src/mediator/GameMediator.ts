@@ -95,6 +95,7 @@ export class GameMediator {
 			console.log("hasPath", nextCell);
 			await new Promise((resolve) => gsap.delayedCall(1, resolve));
 			if (nextCell) {
+				await this.playWaterFlow(nextCell, 1);
 				// change currentCell //this.checkHasPath change to finNextCell
 				// currentCell = nextCell;
 				this.currectPathLength++;
@@ -166,6 +167,11 @@ export class GameMediator {
 	//         this.gameScene.getStartCell()
 	//     );
 	// }
+
+	async playWaterFlow(cell: Cell, delay: number) {
+		await cell.playWaterFlow();
+		await new Promise((resolve) => gsap.delayedCall(delay, resolve));
+	}
 
 	get gameScene() {
 		return this._gameScene;

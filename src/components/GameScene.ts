@@ -79,15 +79,6 @@ export class GameScene extends Container {
 	}
 
 	mountPipeQueue() {
-		// const pipeQueueContainer = new Container();
-		// const padding = 10;
-		// for (let i = 0; i < PIPE_QUEUE_LENGHT; i++) {
-		//     const pipe = this._randomPipeGenerator.generate();
-		//     console.log(pipe);
-		//     pipe.y = i * (pipe.height + padding);
-		//     pipeQueueContainer.addChild(pipe);
-		// }
-		// this.addChild(pipeQueueContainer);
 		this.pipeQueue = new PipeQueue(
 			{length: this._config.pipeQueueLength},
 			this._randomPipeGenerator
@@ -170,8 +161,7 @@ export class GameScene extends Container {
 
 	async update() {
 		if (this.isLoaded) {
-			// this._sprite.x += 1;
-			// this.pipeQueue.update();
+			this.pipeQueue.update();
 		}
 		// Load assets
 		// Assets.add({

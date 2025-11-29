@@ -1,3 +1,4 @@
+import gsap from "gsap";
 import {Container, Sprite, Texture} from "pixi.js";
 
 export enum DIRECTION {
@@ -12,36 +13,44 @@ interface PipeConfig {
 	texture: Texture;
 	rotation: number;
 	defaultDirections: DIRECTION[];
+	textureFilled?: Texture;
 }
 
 export class Pipe extends Container {
 	static spriteHeight = 32;
 	private _id: number;
 	private _config: PipeConfig;
-	private _sprite: Sprite;
+	private _spriteDefault: Sprite;
+	private _spriteFilled: Sprite;
 	private _isActive: boolean = false;
 
 	private _isGrowing: boolean = false;
 
 	constructor(config: PipeConfig) {
-		super(config.texture);
+		super();
 
 		this._config = config;
-		this._sprite = Sprite.from(config.texture);
-		this._sprite.anchor.set(0.5);
-		this.angle = config.rotation;
-		this.eventMode = "static";
 
-		this.addChild(this._sprite);
+		this._spriteDefault = Sprite.from(this._config.texture);
+		this._spriteDefault.anchor.set(0.5);
+
+		if (this._config.textureFilled) {
+			this._spriteFilled = Sprite.from(this._config.textureFilled);
+			this._spriteFilled.anchor.set(0.5);
+			this._spriteFilled.alpha = 0;
+			this.addChild(this._spriteFilled);
+		}
+
+		this.angle = this._config.rotation;
+
+		this.addChild(this._spriteDefault);
 	}
 
 	setActive(value: boolean) {
 		this._isActive = value;
 		if (value) {
-			this.cursor = "pointer";
 			this._isGrowing = true;
 		} else {
-			this.cursor = "arrow";
 			this._isGrowing = false;
 			this.scale.set(1);
 		}
@@ -67,19 +76,31 @@ export class Pipe extends Container {
 		}
 	}
 
-	getConnectionDirections() {
+	getConnectionDirections(): DIRECTION[] {
 		return this._config.defaultDirections.map((direction: DIRECTION) =>
 			this.getDirectionForRotation(direction, this._config.rotation)
 		);
 	}
 
-	getDirectionForRotation(direction: DIRECTION, rotation: number) {
+	getDirectionForRotation(direction: DIRECTION, rotation: number): DIRECTION {
 		if (rotation === 0) {
 			return direction;
 		}
 		// or DIRECTION[direction+ROTATIONS.indexOf(rotation) +1]
-		console.log(DIRECTION[direction + rotation / 90]);
-		return DIRECTION[direction + rotation / 90];
+		// return DIRECTION[direction + rotation / 90];
+		const directionsClockWise = [DIRECTION.NN, DIRECTION.EE, DIRECTION.SS, DIRECTION.WW];
+		return directionsClockWise[direction + rotation / 90];
+	}
+
+	async playWaterFlow() {
+		if (!this._spriteFilled) return;
+
+		const duration = 0.5;
+
+		await Promise.all([
+			gsap.to(this._spriteDefault, {alpha: 0, duration}),
+			gsap.to(this._spriteFilled, {alpha: 1, duration}),
+		]);
 	}
 
 	update() {
@@ -90,5 +111,7 @@ export class Pipe extends Container {
 
 	reset() {
 		this.setActive(false);
+		this._spriteDefault.alpha = 1;
+		this._spriteFilled.alpha = 0;
 	}
 }

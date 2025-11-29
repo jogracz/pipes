@@ -1,0 +1,10 @@
+{
+	"gameName": "Pipes",
+	"grid": {
+		"columns": 9,
+		"rows": 7,
+		"blockedCells": 7
+	},
+	"waterStartDelayinMs": 5000,
+	"pipeQueueLength": 5
+}

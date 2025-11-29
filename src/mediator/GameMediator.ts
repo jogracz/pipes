@@ -21,7 +21,20 @@ type Result = {
 	pathLength: number;
 	date: Date;
 };
+
+export interface Config {
+	gameName: string;
+	grid: {
+		columns: number;
+		rows: number;
+		blockedCells: number;
+	};
+	waterStartDelayinMs: number;
+	pipeQueueLength: number;
+}
+
 export class GameMediator {
+	private _config: any;
 	private _gameScene: GameScene;
 	private _hasMoves: boolean = true;
 	private _isEvaluating: boolean = true;
@@ -30,8 +43,9 @@ export class GameMediator {
 	private currectPathLength: number = 0;
 	// private _startCell: Cell;
 
-	constructor() {
-		this._gameScene = new GameScene();
+	constructor(config: Config) {
+		this._config = config;
+		this._gameScene = new GameScene(this._config);
 	}
 
 	// LOADING: "LOADING",

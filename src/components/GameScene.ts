@@ -1,202 +1,202 @@
-import { Assets, Container, Spritesheet, Text, TextStyle } from "pixi.js";
-import { pipesAtlas, pipes_spritesheet, menu, button } from "../assets";
-import { Cell, CellConfig, Grid } from "./grid";
-import { RandomPipeGenerator, PipeQueue, Pipe, DIRECTION } from "./pipes";
-import { Menu } from "./ui";
+import {Assets, Container, Spritesheet, Text, TextStyle} from "pixi.js";
+import {pipesAtlas, pipes_spritesheet, menu, button} from "../assets";
+import {Cell, CellConfig, Grid} from "./grid";
+import {RandomPipeGenerator, PipeQueue, Pipe, DIRECTION} from "./pipes";
+import {Menu} from "./ui";
+import {Config} from "../mediator";
 
 const PIPE_QUEUE_LENGHT = 7;
 enum PIPE_TYPE {
-    STRAIGHT,
-    CURVED,
-    CROSS,
+	STRAIGHT,
+	CURVED,
+	CROSS,
 }
 
 const PIPE_DIRECTIONS = {
-    [PIPE_TYPE.STRAIGHT]: [DIRECTION.NN, DIRECTION.SS],
-    [PIPE_TYPE.CURVED]: [DIRECTION.SS, DIRECTION.EE],
-    [PIPE_TYPE.CROSS]: [DIRECTION.NN, DIRECTION.SS, DIRECTION.EE, DIRECTION.WW],
+	[PIPE_TYPE.STRAIGHT]: [DIRECTION.NN, DIRECTION.SS],
+	[PIPE_TYPE.CURVED]: [DIRECTION.SS, DIRECTION.EE],
+	[PIPE_TYPE.CROSS]: [DIRECTION.NN, DIRECTION.SS, DIRECTION.EE, DIRECTION.WW],
 };
 export class GameScene extends Container {
-    private _isLoaded = false;
-    private _loader: Text;
-    private menu: Menu;
-    private pipesSpritesheet: Spritesheet<typeof pipesAtlas>;
-    private pipeQueue: PipeQueue;
-    private grid: Grid;
-    private startPipe: Pipe;
-    isStarted: boolean = false;
+	private _config: Config;
+	private _isLoaded = false;
+	private _loader: Text;
+	private menu: Menu;
+	private pipesSpritesheet: Spritesheet<typeof pipesAtlas>;
+	private pipeQueue: PipeQueue;
+	private grid: Grid;
+	private startPipe: Pipe;
+	isStarted: boolean = false;
 
-    private _randomPipeGenerator: RandomPipeGenerator;
+	private _randomPipeGenerator: RandomPipeGenerator;
 
-    constructor() {
-        super();
+	constructor(config: Config) {
+		super();
 
-        this._loader = this.createLoader();
-        this.addChild(this._loader);
+		this._config = config;
 
-        this.load().then(() => {
-            this._randomPipeGenerator = new RandomPipeGenerator(
-                this.pipesSpritesheet
-            );
-            this.mountComponents();
-            this.relayout();
-        });
-    }
+		this._loader = this.createLoader();
+		this.addChild(this._loader);
 
-    createLoader() {
-        const loader = new Text();
-        loader.style = new TextStyle({
-            fontFamily: "Arial",
-            fontSize: 82,
-            fontWeight: "bold",
-            fill: "#66CCCC",
-        });
-        loader.text = "Loading...";
-        loader.x = window.innerWidth / 2;
-        loader.y = window.innerHeight / 2;
-        loader.anchor.set(0.5);
-        return loader;
-    }
+		this.load().then(() => {
+			this._randomPipeGenerator = new RandomPipeGenerator(this.pipesSpritesheet);
+			this.mountComponents();
+			this.relayout();
+		});
+	}
 
-    async load() {
-        await Assets.load({ alias: "button", src: button });
-        await Assets.load({ alias: "menu", src: menu });
-        const pipeTexture = await Assets.load(pipes_spritesheet);
-        this.pipesSpritesheet = new Spritesheet(pipeTexture, pipesAtlas);
-        await this.pipesSpritesheet.parse();
+	createLoader() {
+		const loader = new Text();
+		loader.style = new TextStyle({
+			fontFamily: "Arial",
+			fontSize: 82,
+			fontWeight: "bold",
+			fill: "#66CCCC",
+		});
+		loader.text = "Loading...";
+		loader.x = window.innerWidth / 2;
+		loader.y = window.innerHeight / 2;
+		loader.anchor.set(0.5);
+		return loader;
+	}
 
-        this._isLoaded = true;
-        this.removeChild(this._loader);
-    }
+	async load() {
+		await Assets.load({alias: "button", src: button});
+		await Assets.load({alias: "menu", src: menu});
+		const pipeTexture = await Assets.load(pipes_spritesheet);
+		this.pipesSpritesheet = new Spritesheet(pipeTexture, pipesAtlas);
+		await this.pipesSpritesheet.parse();
 
-    mountComponents() {
-        this.mountMenu();
-        this.mountPipeQueue();
-        this.mountGrid();
-        this.mountStartPipe();
-    }
+		this._isLoaded = true;
+		this.removeChild(this._loader);
+	}
 
-    mountPipeQueue() {
-        // const pipeQueueContainer = new Container();
-        // const padding = 10;
-        // for (let i = 0; i < PIPE_QUEUE_LENGHT; i++) {
-        //     const pipe = this._randomPipeGenerator.generate();
-        //     console.log(pipe);
-        //     pipe.y = i * (pipe.height + padding);
-        //     pipeQueueContainer.addChild(pipe);
-        // }
-        // this.addChild(pipeQueueContainer);
-        this.pipeQueue = new PipeQueue(
-            { length: PIPE_QUEUE_LENGHT },
-            this._randomPipeGenerator
-        );
-        this.pipeQueue.visible = false;
-        this.addChild(this.pipeQueue);
-    }
+	mountComponents() {
+		this.mountMenu();
+		this.mountPipeQueue();
+		this.mountGrid();
+		this.mountStartPipe();
+	}
 
-    mountGrid() {
-        this.grid = new Grid({
-            columnsCount: 9,
-            rowsCount: 7,
-            blockersCount: 5,
-        });
-        this.grid.x = 50;
-        this.grid.visible = false;
-        this.addChild(this.grid);
-    }
+	mountPipeQueue() {
+		// const pipeQueueContainer = new Container();
+		// const padding = 10;
+		// for (let i = 0; i < PIPE_QUEUE_LENGHT; i++) {
+		//     const pipe = this._randomPipeGenerator.generate();
+		//     console.log(pipe);
+		//     pipe.y = i * (pipe.height + padding);
+		//     pipeQueueContainer.addChild(pipe);
+		// }
+		// this.addChild(pipeQueueContainer);
+		this.pipeQueue = new PipeQueue(
+			{length: this._config.pipeQueueLength},
+			this._randomPipeGenerator
+		);
+		this.pipeQueue.visible = false;
+		this.addChild(this.pipeQueue);
+	}
 
-    mountStartPipe() {
-        this.startPipe = new Pipe({
-            texture: this.pipesSpritesheet.textures.start,
-            rotation: 0,
-            defaultDirections: PIPE_DIRECTIONS[PIPE_TYPE.STRAIGHT],
-        });
-        this.startPipe.visible = false;
-    }
+	mountGrid() {
+		this.grid = new Grid({
+			columnsCount: this._config.grid.columns,
+			rowsCount: this._config.grid.rows,
+			blockersCount: this._config.grid.blockedCells,
+		});
+		this.grid.x = 50;
+		this.grid.visible = false;
+		this.addChild(this.grid);
+	}
 
-    mountMenu() {
-        this.menu = new Menu();
-        this.addChild(this.menu);
-    }
+	mountStartPipe() {
+		this.startPipe = new Pipe({
+			texture: this.pipesSpritesheet.textures.start,
+			rotation: 0,
+			defaultDirections: PIPE_DIRECTIONS[PIPE_TYPE.STRAIGHT],
+		});
+		this.startPipe.visible = false;
+	}
 
-    get isLoaded() {
-        return this._isLoaded;
-    }
+	mountMenu() {
+		this.menu = new Menu({gameName: this._config.gameName});
+		this.addChild(this.menu);
+	}
 
-    activateBoard() {
-        this.grid.activate();
-        this.pipeQueue.activate();
-    }
+	get isLoaded() {
+		return this._isLoaded;
+	}
 
-    showBoard() {
-        this.grid.visible = true;
-        this.pipeQueue.visible = true;
-    }
+	activateBoard() {
+		this.grid.activate();
+		this.pipeQueue.activate();
+	}
 
-    get components() {
-        return {
-            menu: this.menu,
-            grid: this.grid,
-            pipeQueue: this.pipeQueue,
-        };
-    }
+	showBoard() {
+		this.grid.visible = true;
+		this.pipeQueue.visible = true;
+	}
 
-    async waitForMove(callback: (cel: Cell) => void) {
-        await this.grid.waitForMove(callback);
-    }
+	get components() {
+		return {
+			menu: this.menu,
+			grid: this.grid,
+			pipeQueue: this.pipeQueue,
+		};
+	}
 
-    getCurrentPipe(): Pipe {
-        return this.pipeQueue.getCurrentPipe();
-    }
+	async waitForMove(callback: (cel: Cell) => void) {
+		await this.grid.waitForMove(callback);
+	}
 
-    getStartCell(): Cell {
-        return this.grid.startCell;
-    }
+	getCurrentPipe(): Pipe {
+		return this.pipeQueue.getCurrentPipe();
+	}
 
-    getActiveCells() {
-        return this.grid.getActiveCells();
-    }
+	getStartCell(): Cell {
+		return this.grid.startCell;
+	}
 
-    hasActiveCells() {
-        return this.getActiveCells().length > 50;
-    }
+	getActiveCells() {
+		return this.grid.getActiveCells();
+	}
 
-    getValidNeighbours(cell: Cell) {
-        console.log("this.grid.getValidNeighbours(cell)");
-        return this.grid.getValidNeighbours(cell);
-    }
+	hasActiveCells() {
+		return this.getActiveCells().length > 50;
+	}
 
-    async update() {
-        if (this.isLoaded) {
-            // this._sprite.x += 1;
-            this.pipeQueue.update();
-        }
-        // Load assets
-        // Assets.add({
-        //     alias: "atlas",
-        //     src: "images/spritesheet.json",
-        //     data: { imageFilename: "my-spritesheet.2x.avif" }, // using of custom filename located in "images/my-spritesheet.2x.avif"
-        // });
-        // const sheet = await Assets.load("atlas");
-        // sheet.frame1
-        // Mount components
-        // Await user input
-        // Play bg music
-        // Play game
-    }
+	getValidNeighbours(cell: Cell) {
+		console.log("this.grid.getValidNeighbours(cell)");
+		return this.grid.getValidNeighbours(cell);
+	}
 
-    relayout() {
-        this.x = window.innerWidth / 2;
-        this.y = window.innerHeight / 2;
+	async update() {
+		if (this.isLoaded) {
+			// this._sprite.x += 1;
+			// this.pipeQueue.update();
+		}
+		// Load assets
+		// Assets.add({
+		//     alias: "atlas",
+		//     src: "images/spritesheet.json",
+		//     data: { imageFilename: "my-spritesheet.2x.avif" }, // using of custom filename located in "images/my-spritesheet.2x.avif"
+		// });
+		// const sheet = await Assets.load("atlas");
+		// sheet.frame1
+		// Mount components
+		// Await user input
+		// Play bg music
+		// Play game
+	}
 
-        Object.values(this.components).forEach((component) =>
-            component.relayout()
-        );
-        this.pipeQueue.x = this.pipeQueue.x + this.grid.x - 20;
-    }
+	relayout() {
+		this.x = window.innerWidth / 2;
+		this.y = window.innerHeight / 2;
 
-    reset() {
-        this.grid.reset(this.startPipe);
-        this.pipeQueue.reset();
-    }
+		Object.values(this.components).forEach((component) => component.relayout());
+		this.pipeQueue.x = this.pipeQueue.x + this.grid.x - 20;
+	}
+
+	reset() {
+		this.grid.reset(this.startPipe);
+		this.pipeQueue.reset();
+	}
 }

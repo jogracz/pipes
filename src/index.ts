@@ -1,31 +1,33 @@
 import "./style.css";
-import { Application, Ticker } from "pixi.js";
-import { GameScene } from "./components";
-import { gsap } from "gsap";
-import { PixiPlugin } from "gsap/PixiPlugin";
-import { GameMediator } from "./mediator";
+import {Application, Ticker} from "pixi.js";
+import {GameScene} from "./components";
+import {gsap} from "gsap";
+import {PixiPlugin} from "gsap/PixiPlugin";
+import {GameMediator} from "./mediator";
+import config from "./config.json";
 
 gsap.registerPlugin(PixiPlugin);
 
 (async () => {
-    const pixiApp = new Application();
-    await pixiApp.init({
-        background: "#1099bb",
-        resizeTo: window,
-    });
+	// INITIATE PIXI APP
+	const pixiApp = new Application();
+	await pixiApp.init({
+		background: "#1099bb",
+		resizeTo: window,
+	});
 
-    document.body.appendChild(pixiApp.canvas);
+	document.body.appendChild(pixiApp.canvas);
 
-    // const gameScene = new GameScene();
-    const gameMediator = new GameMediator();
+	// const gameScene = new GameScene();
+	const gameMediator = new GameMediator(config);
 
-    pixiApp.stage.addChild(gameMediator.gameScene);
-    window.addEventListener("resize", () => gameMediator.gameScene.relayout());
+	pixiApp.stage.addChild(gameMediator.gameScene);
+	window.addEventListener("resize", () => gameMediator.gameScene.relayout());
 
-    pixiApp.ticker.add((ticker: Ticker) => {
-        gameMediator.update();
-    });
+	pixiApp.ticker.add((ticker: Ticker) => {
+		gameMediator.update();
+	});
 
-    await gameMediator.loadAssets();
-    await gameMediator.startGame();
+	await gameMediator.loadAssets();
+	await gameMediator.startGame();
 })();

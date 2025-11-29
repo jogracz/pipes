@@ -1,21 +1,57 @@
 import gsap from "gsap/all";
 import {Assets, Container, Sprite, Text, TextStyle} from "pixi.js";
 
+interface MenuConfig {
+	gameName: string;
+}
+
 export class Menu extends Container {
+	private _config: MenuConfig;
 	private bg: Sprite;
 	private button: Sprite;
 	private buttonLabel: Text;
 
-	constructor() {
+	constructor(config: MenuConfig) {
 		super();
-		this.scale.set(0.8);
-		this.bg = Sprite.from(Assets.get("menu"));
-		this.bg.anchor.set(0.5);
 
-		this.button = Sprite.from(Assets.get("button"));
-		this.button.anchor.set(0.5);
-		this.button.eventMode = "static";
-		this.buttonLabel = new Text({
+		this._config = config;
+
+		this.bg = this.createBackground();
+
+		this.button = this.createStartButton();
+
+		this.addChild(this.bg);
+		this.addChild(this.button);
+
+		this.scale.set(0.8);
+	}
+
+	createBackground() {
+		const bg = Sprite.from(Assets.get("menu"));
+		bg.anchor.set(0.5);
+
+		const gameNameLabel = new Text({
+			text: this._config.gameName,
+			style: new TextStyle({
+				fontSize: 80,
+				fill: "#dfe8e9ff",
+				stroke: "#aaaaaa",
+				fontWeight: "bolder",
+			}),
+		});
+		gameNameLabel.anchor.set(0.5);
+		gameNameLabel.y = -320;
+		bg.addChild(gameNameLabel);
+
+		return bg;
+	}
+
+	createStartButton() {
+		const button = Sprite.from(Assets.get("button"));
+		button.anchor.set(0.5);
+		button.eventMode = "static";
+
+		const buttonLabel = new Text({
 			text: "Start",
 			style: new TextStyle({
 				fontSize: 80,
@@ -23,14 +59,13 @@ export class Menu extends Container {
 				stroke: "#aaaaaa",
 			}),
 		});
-		this.buttonLabel.anchor.set(0.5);
+		buttonLabel.anchor.set(0.5);
+		button.addChild(buttonLabel);
 
-		this.addChild(this.bg);
-		this.addChild(this.button);
-		this.button.addChild(this.buttonLabel);
+		button.on("pointerover", this.onHover);
+		button.on("pointerout", this.onHoverEnd);
 
-		this.button.on("pointerover", this.onHover);
-		this.button.on("pointerout", this.onHoverEnd);
+		return button;
 	}
 
 	async awaitStartClick() {

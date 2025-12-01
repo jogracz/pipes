@@ -22,15 +22,16 @@ export class Timer extends Container {
 	}
 
 	createLabel() {
-		console.log("TIME LABEL %%%%%%%%%");
 		const label = new Text({
 			text: this.formatLabel(this.value),
 			style: new TextStyle({
+				align: "left",
 				fontSize: 30,
 				fill: "#ffffff",
 				stroke: "#aaaaaa",
 			}),
 		});
+		label.alpha = 0.9;
 		label.anchor.set(0.5);
 
 		return label;

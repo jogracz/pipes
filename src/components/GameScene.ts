@@ -1,8 +1,8 @@
-import {Assets, Container, Spritesheet, Text, TextStyle} from "pixi.js";
-import {pipesAtlas, pipes_spritesheet, menu, button} from "../assets";
+import {Assets, Container, Sprite, Spritesheet, Text, TextStyle, Texture} from "pixi.js";
+import {pipesAtlas, pipes_spritesheet, menu, button, clouds} from "../assets";
 import {Cell, CellConfig, Grid} from "./grid";
 import {RandomPipeGenerator, PipeQueue, Pipe, DIRECTION} from "./pipes";
-import {Menu, Timer} from "./ui";
+import {Menu, ResetButton, Timer} from "./ui";
 import {Config} from "../mediator";
 
 const PIPE_QUEUE_LENGHT = 7;
@@ -19,6 +19,7 @@ const PIPE_DIRECTIONS = {
 };
 export class GameScene extends Container {
 	private _config: Config;
+	private _bg: Sprite;
 	private _isLoaded = false;
 	private _loader: Text;
 	private menu: Menu;
@@ -27,6 +28,7 @@ export class GameScene extends Container {
 	private pipeQueue: PipeQueue;
 	private grid: Grid;
 	private startPipe: Pipe;
+	private resetButton: ResetButton;
 	isStarted: boolean = false;
 
 	private _randomPipeGenerator: RandomPipeGenerator;
@@ -62,6 +64,7 @@ export class GameScene extends Container {
 	}
 
 	async load() {
+		await Assets.load({alias: "cloudsBg", src: clouds});
 		await Assets.load({alias: "button", src: button});
 		await Assets.load({alias: "menu", src: menu});
 		const pipeTexture = await Assets.load(pipes_spritesheet);
@@ -73,11 +76,19 @@ export class GameScene extends Container {
 	}
 
 	mountComponents() {
-		this.mountMenu();
+		this.mountBackground();
 		this.mountTimer();
+		this.mountResetButton();
+		this.mountMenu();
 		this.mountPipeQueue();
 		this.mountGrid();
 		this.mountStartPipe();
+	}
+
+	mountBackground() {
+		this._bg = Sprite.from(Texture.from(clouds));
+		this._bg.anchor.set(0.5);
+		this.addChild(this._bg);
 	}
 
 	mountPipeQueue() {
@@ -116,9 +127,16 @@ export class GameScene extends Container {
 
 	mountTimer() {
 		this.timer = new Timer({defaultValue: this._config.waterStartDelayinMs});
-		this.timer.x = 290;
-		this.timer.y = -300;
+		this.timer.x = -185;
+		this.timer.y = -240;
 		this.addChild(this.timer);
+	}
+
+	mountResetButton() {
+		this.resetButton = new ResetButton();
+		this.resetButton.x = 185;
+		this.resetButton.y = -240;
+		this.addChild(this.resetButton);
 	}
 
 	get isLoaded() {
@@ -165,7 +183,6 @@ export class GameScene extends Container {
 	}
 
 	getValidNeighbours(cell: Cell) {
-		console.log("this.grid.getValidNeighbours(cell)");
 		return this.grid.getValidNeighbours(cell);
 	}
 

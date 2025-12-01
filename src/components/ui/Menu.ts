@@ -33,7 +33,7 @@ export class Menu extends Container {
 		const gameNameLabel = new Text({
 			text: this._config.gameName,
 			style: new TextStyle({
-				fontSize: 80,
+				fontSize: 60,
 				fill: "#dfe8e9ff",
 				stroke: "#aaaaaa",
 				fontWeight: "bolder",

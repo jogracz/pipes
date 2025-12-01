@@ -1,6 +1,7 @@
 export const button = require("./button.png");
 export const menu = require("./menu.png");
 export const pipes_spritesheet = require("./pipes_tileset.png");
+export const clouds = require("./orig_big 17.png"); //8!!,9!!,12,14,17!,18!,
 export const pipesAtlas = {
 	frames: {
 		straight: {

@@ -1,5 +1,4 @@
-import gsap from "gsap/all";
-import {Assets, Container, Sprite, Text, TextStyle} from "pixi.js";
+import {Container, Text, TextStyle} from "pixi.js";
 
 interface TimerConfig {
 	defaultValue: number;
@@ -26,7 +25,7 @@ export class Timer extends Container {
 			text: this.formatLabel(this.value),
 			style: new TextStyle({
 				align: "left",
-				fontSize: 30,
+				fontSize: 28,
 				fill: "#ffffff",
 				stroke: "#aaaaaa",
 			}),

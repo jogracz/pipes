@@ -82,10 +82,6 @@ export class Grid extends Container {
 		cell2.pipe.getConnectionDirections();
 	}
 
-	//     getConnectionDirections(cell:Cell) {
-	// cell.pipe.
-	//     }
-
 	activate() {
 		this._isActive = true;
 		this.allCells.forEach((cell: Cell) => cell.setActive(!cell.isBlocked && !cell.hasPipe));
@@ -109,9 +105,6 @@ export class Grid extends Container {
 	private getAllNeighbours(cell: Cell): Neighbour[] {
 		const gridColumn = cell.config.gridColumn;
 		const gridRow = cell.config.gridRow;
-		// const columnsCount = this.config.columnsCount; //9
-		// const rowsCount = this.config.rowsCount; //7
-		// const possibleDirections = cell.pipe.getConnectionDirections();
 
 		const neighbours: Neighbour[] = [
 			{
@@ -156,7 +149,6 @@ export class Grid extends Container {
 					neighbour.cell.pipe.getConnectionDirections()
 				)
 			);
-		// .filter().canconnect()
 	}
 
 	areMatchingDirections(dir1: DIRECTION, dirArray: DIRECTION[]) {

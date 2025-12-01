@@ -1,12 +1,11 @@
 import {Assets, Container, Sprite, Spritesheet, Text, TextStyle, Texture} from "pixi.js";
 import {Howl} from "howler";
-import {pipesAtlas, pipes_spritesheet, menu, button, clouds, sounds} from "../assets";
-import {Cell, CellConfig, Grid} from "./grid";
+import {pipesAtlas, pipesSpritesheet, menu, button, clouds, sounds} from "../assets";
+import {Cell, Grid} from "./grid";
 import {RandomPipeGenerator, PipeQueue, Pipe, DIRECTION} from "./pipes";
 import {Menu, ResetButton, Timer} from "./ui";
-import {Config} from "../mediator";
+import {Config} from "../controller";
 
-const PIPE_QUEUE_LENGHT = 7;
 enum PIPE_TYPE {
 	STRAIGHT,
 	CURVED,
@@ -78,7 +77,7 @@ export class GameScene extends Container {
 		await Assets.load({alias: "menu", src: menu});
 		// await Assets.load({alias: "sounds", src: sounds});
 
-		const pipeTexture = await Assets.load(pipes_spritesheet);
+		const pipeTexture = await Assets.load(pipesSpritesheet);
 		this.pipesSpritesheet = new Spritesheet(pipeTexture, pipesAtlas);
 		await this.pipesSpritesheet.parse();
 
@@ -158,6 +157,7 @@ export class GameScene extends Container {
 		this.timer = new Timer({defaultValue: this._config.waterStartDelayinMs});
 		this.timer.x = -185;
 		this.timer.y = -240;
+		this.timer.visible = false;
 		this.addChild(this.timer);
 	}
 
@@ -165,6 +165,7 @@ export class GameScene extends Container {
 		this.resetButton = new ResetButton();
 		this.resetButton.x = 185;
 		this.resetButton.y = -240;
+		this.resetButton.visible = false;
 		this.addChild(this.resetButton);
 	}
 
@@ -180,6 +181,8 @@ export class GameScene extends Container {
 	showBoard() {
 		this.grid.visible = true;
 		this.pipeQueue.visible = true;
+		this.timer.visible = true;
+		this.resetButton.visible = true;
 	}
 
 	get components() {
@@ -219,18 +222,6 @@ export class GameScene extends Container {
 		if (this.isLoaded) {
 			this.pipeQueue.update();
 		}
-		// Load assets
-		// Assets.add({
-		//     alias: "atlas",
-		//     src: "images/spritesheet.json",
-		//     data: { imageFilename: "my-spritesheet.2x.avif" }, // using of custom filename located in "images/my-spritesheet.2x.avif"
-		// });
-		// const sheet = await Assets.load("atlas");
-		// sheet.frame1
-		// Mount components
-		// Await user input
-		// Play bg music
-		// Play game
 	}
 
 	relayout() {

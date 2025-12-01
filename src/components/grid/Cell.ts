@@ -6,7 +6,8 @@ export interface CellConfig {
 	gridColumn: number;
 	gridRow: number;
 }
-const COLOR_DEFAULT = "#ffffff";
+const COLOR_DEFAULT = "#f3f1e9ff";
+// const COLOR_DEFAULT = "#ffffff";
 const OPACITY_BLOCKED = 0.4;
 const OPACITY_DEFAULT = 0.9;
 export class Cell extends Container {
@@ -31,7 +32,6 @@ export class Cell extends Container {
 	}
 
 	private async onHover() {
-		// Add stoping animation(timeline.to1)
 		if (this.isBlocked && !this._isActive) return;
 		const vars = {
 			scale: 1,
@@ -101,8 +101,6 @@ export class Cell extends Container {
 		this.pipe.visible = true;
 		this.addChild(this.pipe);
 		this.pipe.position.set(0);
-		// console.log("this.position.y", this.position.y);
-		// console.log("this.background.y", this.background.y);
 	}
 
 	removePipe() {

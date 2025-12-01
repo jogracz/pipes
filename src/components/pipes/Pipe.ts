@@ -91,8 +91,7 @@ export class Pipe extends Container {
 		if (rotation === 0) {
 			return direction;
 		}
-		// or DIRECTION[direction+ROTATIONS.indexOf(rotation) +1]
-		// return DIRECTION[direction + rotation / 90];
+
 		const directionsClockWise = [DIRECTION.NN, DIRECTION.EE, DIRECTION.SS, DIRECTION.WW];
 		const directionIndex = directionsClockWise.indexOf(direction);
 		const newIndex = directionIndex + rotation / 90;

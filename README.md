@@ -25,7 +25,8 @@ link
 -   winning logic //
 -   losing logic,//
 -   basic sounds for clicking on buttons, placing pipes, winning, and losing, //
--   basic animations increasing ux appeal
+-   basic animations increasing ux appeal,
+-   timer
 
 ## what could be added/improved:
 
@@ -34,7 +35,7 @@ link
 -   better cell store and access system,
 -   better game state system,
 -   better animations,
--   tests
+-   tests,
 
 ## To run it locally, clone this repo and run:
 

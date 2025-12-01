@@ -17,7 +17,6 @@ export class PipeQueue extends Container {
 		super();
 		this._config = config;
 		this._randomPipeGenerator = randomPipeGenerator;
-		// this.eventMode = "static";
 
 		this.populate();
 	}
@@ -37,13 +36,11 @@ export class PipeQueue extends Container {
 	}
 
 	getCurrentPipe(): Pipe {
-		// if (this.pipes[0].isActive) {
 		const currentPipe = this.pipes.shift();
 		currentPipe.setActive(false);
 		currentPipe.y = 0;
 		this.addNewPipe();
 		return currentPipe;
-		// }
 	}
 
 	async addNewPipe() {

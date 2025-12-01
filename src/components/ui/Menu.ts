@@ -9,6 +9,7 @@ export class Menu extends Container {
 	private _config: MenuConfig;
 	private _clickSound: Howl;
 	private bg: Sprite;
+	private gameName: Text;
 	private button: Sprite;
 	private buttonLabel: Text;
 
@@ -19,50 +20,76 @@ export class Menu extends Container {
 		this._clickSound = clickSound;
 
 		this.bg = this.createBackground();
+		this.gameName = this.createGameNameLabel();
 
 		this.button = this.createStartButton();
 
 		this.addChild(this.bg);
+		this.addChild(this.gameName);
 		this.addChild(this.button);
-
-		this.scale.set(0.8);
 	}
 
 	createBackground() {
-		const bg = Sprite.from(Assets.get("menu"));
+		const texture = Assets.get("menu");
+		// fix pixel-art antialiasing
+		texture.source.scaleMode = "nearest";
+		const bg = Sprite.from(texture);
+		bg.scale.set(7);
 		bg.anchor.set(0.5);
 
-		const gameNameLabel = new Text({
-			text: this._config.gameName,
-			style: new TextStyle({
-				fontSize: 60,
-				fill: "#dfe8e9ff",
-				stroke: "#aaaaaa",
-				fontWeight: "bolder",
-			}),
-		});
-		gameNameLabel.anchor.set(0.5);
-		gameNameLabel.y = -320;
-		bg.addChild(gameNameLabel);
+		// const gameNameLabel = new Text({
+		// 	text: this._config.gameName,
+		// 	style: new TextStyle({
+		// 		fontSize: 60,
+		// 		fill: "#dfe8e9ff",
+		// 		stroke: "#aaaaaa",
+		// 		fontWeight: "bolder",
+		// 	}),
+		// });
+		// gameNameLabel.anchor.set(0.5);
+		// // gameNameLabel.y = -320;
+		// bg.addChild(gameNameLabel);
 
 		return bg;
 	}
 
-	createStartButton() {
-		const button = Sprite.from(Assets.get("button"));
-		button.anchor.set(0.5);
-		button.eventMode = "static";
-
-		const buttonLabel = new Text({
-			text: "Start",
+	createGameNameLabel() {
+		const gameNameLabel = new Text({
+			text: this._config.gameName,
 			style: new TextStyle({
-				fontSize: 80,
-				fill: "#ffffff",
-				stroke: "#aaaaaa",
+				fontSize: 40,
+				fill: "#fffaf1ff",
+				stroke: "#44444444",
+				fontWeight: "bolder",
 			}),
 		});
-		buttonLabel.anchor.set(0.5);
-		button.addChild(buttonLabel);
+		gameNameLabel.anchor.set(0.5);
+		gameNameLabel.x = 2;
+		gameNameLabel.y = -240;
+
+		return gameNameLabel;
+	}
+
+	createStartButton() {
+		const texture = Assets.get("button");
+		texture.source.scaleMode = "nearest";
+		const button = Sprite.from(texture);
+
+		button.scale.set(4);
+		button.anchor.set(0.5);
+		button.alpha = 0.9;
+		button.eventMode = "static";
+
+		// const buttonLabel = new Text({
+		// 	text: "Start",
+		// 	style: new TextStyle({
+		// 		fontSize: 80,
+		// 		fill: "#ffffff",
+		// 		stroke: "#aaaaaa",
+		// 	}),
+		// });
+		// buttonLabel.anchor.set(0.5);
+		// button.addChild(buttonLabel);
 
 		button.on("pointerover", this.onHover);
 		button.on("pointerout", this.onHoverEnd);
@@ -86,12 +113,15 @@ export class Menu extends Container {
 	async onHover() {
 		// if (this.isBlocked && !this._isActive) return;
 		const vars = {
-			scale: 1,
+			scale: 4,
+			alpha: 0.9,
 		};
 		await gsap.to(vars, {
-			scale: 0.98,
+			scale: 3.85,
+			alpha: 1,
 			onUpdate: () => {
 				this.scale.set(vars.scale);
+				this.alpha = vars.alpha;
 			},
 			duration: 0.1,
 		});
@@ -101,13 +131,16 @@ export class Menu extends Container {
 		// if (this.isBlocked && !this._isActive) return;
 
 		const vars = {
-			scale: 0.98,
+			scale: 3.85,
+			alpha: 1,
 		};
 
 		await gsap.to(vars, {
-			scale: 1,
+			scale: 4,
+			alpha: 0.9,
 			onUpdate: () => {
 				this.scale.set(vars.scale);
+				this.alpha = vars.alpha;
 			},
 			duration: 0.15,
 		});

@@ -67,14 +67,14 @@ export class Pipe extends Container {
 
 	animateActive() {
 		if (this._isGrowing) {
-			if (this.scale.x < 1.2) {
-				this.scale.set(this.scale.x + 0.02);
+			if (this.scale.x < 1.1) {
+				this.scale.set(this.scale.x + 0.008);
 			} else {
 				this._isGrowing = false;
 			}
 		} else {
-			if (this.scale.x > 0.8) {
-				this.scale.set(this.scale.x - 0.02);
+			if (this.scale.x > 0.9) {
+				this.scale.set(this.scale.x - 0.008);
 			} else {
 				this._isGrowing = true;
 			}

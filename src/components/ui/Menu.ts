@@ -7,14 +7,16 @@ interface MenuConfig {
 
 export class Menu extends Container {
 	private _config: MenuConfig;
+	private _clickSound: Howl;
 	private bg: Sprite;
 	private button: Sprite;
 	private buttonLabel: Text;
 
-	constructor(config: MenuConfig) {
+	constructor(config: MenuConfig, clickSound: Howl) {
 		super();
 
 		this._config = config;
+		this._clickSound = clickSound;
 
 		this.bg = this.createBackground();
 
@@ -71,6 +73,7 @@ export class Menu extends Container {
 	async awaitStartClick() {
 		await new Promise<void>((resolve) => {
 			const onClick = () => {
+				this._clickSound.play();
 				resolve();
 			};
 			this.button.onclick = onClick;

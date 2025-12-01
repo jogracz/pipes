@@ -15,13 +15,15 @@ export type Neighbour = {
 };
 export class Grid extends Container {
 	private config: GridConfig;
+	private _clickSound: Howl;
 	private allCells: Cell[] = [];
 	private blockedCells: Cell[] = [];
 	private _startCell: Cell;
 	private _isActive: boolean = false;
-	constructor(config: GridConfig) {
+	constructor(config: GridConfig, clickSound: Howl) {
 		super();
 		this.config = config;
+		this._clickSound = clickSound;
 
 		this.populate();
 	}
@@ -30,7 +32,7 @@ export class Grid extends Container {
 		const padding = 2;
 		for (let i = 0; i < this.config.columnsCount; i++) {
 			for (let j = 0; j < this.config.rowsCount; j++) {
-				const cell = new Cell({gridColumn: i, gridRow: j});
+				const cell = new Cell({gridColumn: i, gridRow: j}, this._clickSound);
 				this.allCells.push(cell);
 				cell.x = i * (cell.width + padding);
 				cell.y = j * (cell.height + padding);

@@ -1,5 +1,6 @@
 import {Assets, Container, Sprite, Spritesheet, Text, TextStyle, Texture} from "pixi.js";
-import {pipesAtlas, pipes_spritesheet, menu, button, clouds} from "../assets";
+import {Howl} from "howler";
+import {pipesAtlas, pipes_spritesheet, menu, button, clouds, sounds} from "../assets";
 import {Cell, CellConfig, Grid} from "./grid";
 import {RandomPipeGenerator, PipeQueue, Pipe, DIRECTION} from "./pipes";
 import {Menu, ResetButton, Timer} from "./ui";
@@ -17,6 +18,11 @@ const PIPE_DIRECTIONS = {
 	[PIPE_TYPE.CURVED]: [DIRECTION.SS, DIRECTION.EE],
 	[PIPE_TYPE.CROSS]: [DIRECTION.NN, DIRECTION.SS, DIRECTION.EE, DIRECTION.WW],
 };
+
+export type GameSounds = {
+	bgMusic: Howl;
+	click: Howl;
+};
 export class GameScene extends Container {
 	private _config: Config;
 	private _bg: Sprite;
@@ -29,6 +35,7 @@ export class GameScene extends Container {
 	private grid: Grid;
 	private startPipe: Pipe;
 	private resetButton: ResetButton;
+	private sounds: GameSounds;
 	isStarted: boolean = false;
 
 	private _randomPipeGenerator: RandomPipeGenerator;
@@ -43,7 +50,9 @@ export class GameScene extends Container {
 
 		this.load().then(() => {
 			this._randomPipeGenerator = new RandomPipeGenerator(this.pipesSpritesheet);
+			this.mountSounds();
 			this.mountComponents();
+			this.playBgMusic();
 			this.relayout();
 		});
 	}
@@ -67,12 +76,29 @@ export class GameScene extends Container {
 		await Assets.load({alias: "cloudsBg", src: clouds});
 		await Assets.load({alias: "button", src: button});
 		await Assets.load({alias: "menu", src: menu});
+		// await Assets.load({alias: "sounds", src: sounds});
+
 		const pipeTexture = await Assets.load(pipes_spritesheet);
 		this.pipesSpritesheet = new Spritesheet(pipeTexture, pipesAtlas);
 		await this.pipesSpritesheet.parse();
 
 		this._isLoaded = true;
 		this.removeChild(this._loader);
+	}
+
+	mountSounds() {
+		this.sounds = {
+			click: new Howl({src: sounds.clickSound}),
+			bgMusic: new Howl({src: sounds.bgMusic}),
+			// won: new Howl({src: sounds.wonSoundUrl}),
+		};
+	}
+
+	playBgMusic() {
+		this.sounds.bgMusic.volume(0);
+		this.sounds.bgMusic.play();
+		this.sounds.bgMusic.loop();
+		this.sounds.bgMusic.fade(0, 0.5, 2000);
 	}
 
 	mountComponents() {
@@ -101,11 +127,14 @@ export class GameScene extends Container {
 	}
 
 	mountGrid() {
-		this.grid = new Grid({
-			columnsCount: this._config.grid.columns,
-			rowsCount: this._config.grid.rows,
-			blockersCount: this._config.grid.blockedCells,
-		});
+		this.grid = new Grid(
+			{
+				columnsCount: this._config.grid.columns,
+				rowsCount: this._config.grid.rows,
+				blockersCount: this._config.grid.blockedCells,
+			},
+			this.sounds.click
+		);
 		this.grid.x = 50;
 		this.grid.visible = false;
 		this.addChild(this.grid);
@@ -121,7 +150,7 @@ export class GameScene extends Container {
 	}
 
 	mountMenu() {
-		this.menu = new Menu({gameName: this._config.gameName});
+		this.menu = new Menu({gameName: this._config.gameName}, this.sounds.click);
 		this.addChild(this.menu);
 	}
 

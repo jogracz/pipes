@@ -11,15 +11,18 @@ const OPACITY_BLOCKED = 0.4;
 const OPACITY_DEFAULT = 0.9;
 export class Cell extends Container {
 	config: CellConfig;
+	private _clickSound: Howl;
 	private background: Graphics;
 	private _isBlocked = false;
 	private _isActive: boolean = false;
 	private _isStart: boolean = false;
 	pipe: Pipe;
 
-	constructor(config: CellConfig) {
+	constructor(config: CellConfig, clickSound: Howl) {
 		super();
 		this.config = config;
+		this._clickSound = clickSound;
+
 		this.background = new Graphics().roundRect(-16, -16, 32, 32, 4).fill(COLOR_DEFAULT);
 
 		this.addChild(this.background);
@@ -144,6 +147,7 @@ export class Cell extends Container {
 	async waitForMove(callback: (cell: Cell) => void) {
 		await new Promise<void>((resolve) => {
 			const onClick = () => {
+				this._clickSound.play();
 				resolve();
 				callback(this);
 			};

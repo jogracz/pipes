@@ -1,6 +1,6 @@
 import gsap from "gsap/all";
 import {GameScene} from "../components";
-import {Cell, CellConfig} from "../components/grid";
+import {Cell, Neighbour} from "../components/grid";
 import {Pipe} from "../components/pipes";
 
 export const GAME_STATE = {
@@ -38,10 +38,13 @@ export class GameMediator {
 	private _gameScene: GameScene;
 	private _hasMoves: boolean = true;
 	private _isEvaluating: boolean = true;
+	private _isWaterFilled: boolean = false;
 	private _currentPipe: Pipe;
 	private _results: Result[] = [];
-	private currectPathLength: number = 0;
+	private currectPathLength: number = -1;
 	private _timerInterval: any;
+	private _longestPath: Cell[] = [];
+	private allPaths: Cell[][] = [];
 	// private _startCell: Cell;
 
 	constructor(config: Config) {
@@ -71,12 +74,11 @@ export class GameMediator {
 		console.log("Mainloop stop");
 
 		// EVALUATING: "EVALUATING",
-		console.log("Evaluating start");
+
 		// await this.pathFindingLoop(this.gameScene.getStartCell());
-		// console.log("Evaluating stop");
 
 		// RESULT: "RESULT",
-		// this.handleResult(this.currectPathLength);
+
 		// show result screen
 
 		// AWAITING_INPUT: "AWAITING_INPUT", //START AGAIN?
@@ -85,30 +87,86 @@ export class GameMediator {
 	private async mainLoop() {
 		while (this._hasMoves) {
 			// await new Promise((resolve) => gsap.delayedCall(1, resolve));
-			await this.waitForMove();
 			this.checkHasMoves();
-		}
-	}
-
-	private async pathFindingLoop(startCell: Cell) {
-		let currentCell = startCell;
-		while (this._isEvaluating) {
-			const nextCell = this.getNextCell(currentCell);
-			console.log("hasPath", nextCell);
-			await new Promise((resolve) => gsap.delayedCall(1, resolve));
-			if (nextCell) {
-				await this.playWaterFlow(nextCell, 1);
-				// change currentCell //this.checkHasPath change to finNextCell
-				// currentCell = nextCell;
-				this.currectPathLength++;
-				// this.pathFindingLoop(currentCell)
-			} else {
-				this._isEvaluating = false;
+			// Add exiting if no moves were made and time out
+			if (this._hasMoves) {
+				await this.waitForMove();
 			}
 		}
 	}
 
-	startTimer() {
+	private async pathFindingLoop(startCell: Cell) {
+		console.log("Evaluating start");
+		let currentCell = startCell;
+		while (this._isEvaluating) {
+			// const nextCell = this.getNextCell(currentCell);
+			const nextCells = this.getNextCells(currentCell);
+			console.log("hasPath from ", currentCell.config, !!nextCells);
+			// await new Promise((resolve) => gsap.delayedCall(1, resolve));
+			if (nextCells && nextCells.length > 0) {
+				await Promise.all(
+					nextCells.map(async (cell: Cell) => {
+						// this.pathFindingLoop(cell);
+						return await this.playWaterFlow(cell, 1);
+					})
+				);
+				currentCell = nextCells[0];
+				// await this.playWaterFlow(nextCell, 1);
+				// change currentCell //this.checkHasPath change to finNextCell
+				// currentCell = nextCell;
+				this.currectPathLength++;
+				this.pathFindingLoop(currentCell);
+			} else {
+				console.log("Evaluating stop");
+				this._isEvaluating = false;
+				this._isWaterFilled = true;
+				this.handleResult(this.currectPathLength);
+				console.log("YOUR ESULT:", this.currectPathLength);
+				// gamescene.deactivate()
+			}
+		}
+	}
+
+	async test(currentCell: Cell, currentPath: Cell[] = []) {
+		// let currentLength = 0;
+		// let newLength = 0;
+		// let startCell = this.gameScene.getStartCell();
+		// let currentCell = this.gameScene.getStartCell();
+		let longestPath: Cell[] = [];
+		const allPaths: Cell[][] = [];
+		const allPathsObject: any = {};
+
+		longestPath.push(currentCell);
+		const nextCells = this.getNextCells(currentCell);
+		const hasNextCells = nextCells && nextCells.length > 0;
+		console.log(currentCell.config);
+		currentPath.push(currentCell);
+		console.log(currentPath);
+		this.currectPathLength++;
+		if (hasNextCells) {
+			allPaths.push([currentCell]);
+			nextCells.forEach((cell: Cell) => {
+				// allPaths.push(cell)
+			});
+			// currentLength++;
+
+			return await Promise.all(
+				nextCells.map(async (cell: Cell): Promise<any> => {
+					// const nextCells2 = this.getNextCells(cell);
+					await this.playWaterFlow(cell, 1);
+
+					return this.test(cell, currentPath);
+				})
+			);
+		} else {
+			return currentCell;
+		}
+		// if (newLength > currentLength) {
+		// }
+	}
+
+	async startTimer() {
+		//this async and Promise.race with waterfill
 		const intervalDelay = 100;
 		this._timerInterval = setInterval(() => this.updateTimer(intervalDelay), intervalDelay);
 	}
@@ -122,12 +180,18 @@ export class GameMediator {
 
 	async stopTimer() {
 		clearInterval(this._timerInterval);
-		await this.pathFindingLoop(this.gameScene.getStartCell());
+		// await this.pathFindingLoop(this.gameScene.getStartCell());
+		await this.test(this.gameScene.getStartCell());
 		this._timerInterval = null;
+		this._isEvaluating = false;
+		this._isWaterFilled = true;
+		this.handleResult(this.currectPathLength);
+		console.log("YOUR ESULT:", this.currectPathLength);
+		console.log("all paths:", this.allPaths);
 	}
 
 	checkHasMoves() {
-		if (!this.gameScene.hasActiveCells()) {
+		if (!this.gameScene.hasActiveCells() || this._isWaterFilled) {
 			this._hasMoves = false;
 		}
 	}
@@ -139,9 +203,15 @@ export class GameMediator {
 		return validNeighbours[0].cell; //forEach
 	}
 
+	getNextCells(currentCell: Cell) {
+		const validNeighbours = this.gameScene.getValidNeighbours(currentCell);
+		console.log("VALID NEIGHBOURS", validNeighbours);
+		if (validNeighbours.length === 0) return null;
+		return validNeighbours.map((neighbour: Neighbour) => neighbour.cell);
+	}
+
 	handleResult(pathLength: number) {
 		console.log("max win", this.checkIsMaxResult(pathLength));
-
 		this.saveResult(pathLength);
 	}
 
@@ -176,7 +246,6 @@ export class GameMediator {
 
 	async handleMove(cell: Cell) {
 		// if (this.gameScene.components.pipeQueue.isActive) {
-		console.log(cell.config);
 		const currentPipe = this.gameScene.getCurrentPipe();
 		cell.addPipe(currentPipe);
 		// }
@@ -203,5 +272,6 @@ export class GameMediator {
 
 	resetBoard() {
 		this.gameScene.reset();
+		this._longestPath = [];
 	}
 }

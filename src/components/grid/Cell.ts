@@ -6,9 +6,9 @@ export interface CellConfig {
 	gridColumn: number;
 	gridRow: number;
 }
-const COLOR_DEFAULT = "blue";
-const OPACITY_BLOCKED = 0.2;
-const OPACITY_DEFAULT = 1;
+const COLOR_DEFAULT = "#ffffff";
+const OPACITY_BLOCKED = 0.4;
+const OPACITY_DEFAULT = 0.9;
 export class Cell extends Container {
 	config: CellConfig;
 	private background: Graphics;
@@ -20,7 +20,7 @@ export class Cell extends Container {
 	constructor(config: CellConfig) {
 		super();
 		this.config = config;
-		this.background = new Graphics().rect(-16, -16, 32, 32).fill(COLOR_DEFAULT);
+		this.background = new Graphics().roundRect(-16, -16, 32, 32, 4).fill(COLOR_DEFAULT);
 
 		this.addChild(this.background);
 
@@ -78,21 +78,25 @@ export class Cell extends Container {
 		return this._isActive;
 	}
 
+	get isFilled() {
+		return this.pipe && this.pipe.isFilled;
+	}
+
 	block() {
 		this._isBlocked = true;
-		this.alpha = OPACITY_BLOCKED;
+		this.background.alpha = OPACITY_BLOCKED;
 	}
 
 	unblock() {
 		this._isBlocked = false;
-		this.alpha = OPACITY_DEFAULT;
+		this.background.alpha = OPACITY_DEFAULT;
 	}
 
 	addPipe(pipe: Pipe) {
 		this.setActive(false);
 		this.pipe = pipe;
 		this.pipe.visible = true;
-		this.background.addChild(this.pipe);
+		this.addChild(this.pipe);
 		this.pipe.position.set(0);
 		// console.log("this.position.y", this.position.y);
 		// console.log("this.background.y", this.background.y);
@@ -126,6 +130,10 @@ export class Cell extends Container {
 
 	private setStart(value: boolean) {
 		this._isStart = value;
+	}
+
+	get isStart() {
+		return this._isStart;
 	}
 
 	setStartPipe(startPipe: Pipe) {

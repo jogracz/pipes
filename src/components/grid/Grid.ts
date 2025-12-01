@@ -9,7 +9,7 @@ interface GridConfig {
 	blockersCount: number;
 }
 
-type Neighbour = {
+export type Neighbour = {
 	direction: DIRECTION;
 	cell?: Cell;
 };
@@ -133,21 +133,45 @@ export class Grid extends Container {
 				cell: this.findCell({gridColumn: gridColumn - 1, gridRow}),
 			},
 		];
-		console.log(neighbours);
 
 		return neighbours;
 	}
 
 	getValidNeighbours(cell: Cell) {
 		const neighbours = this.getAllNeighbours(cell);
-		const possibleDirections = cell.pipe.getConnectionDirections();
+		const originCellDirections = cell.pipe.getConnectionDirections();
 
 		return neighbours
 			.filter((neighbour: Neighbour) => !!neighbour.cell)
 			.filter((neighbour: Neighbour) => !neighbour.cell.isBlocked)
 			.filter((neighbour: Neighbour) => neighbour.cell.hasPipe)
-			.filter((neighbour: Neighbour) => possibleDirections.includes(neighbour.direction));
+			.filter((neighbour: Neighbour) => !neighbour.cell.isStart)
+			.filter((neighbour: Neighbour) => !neighbour.cell.isFilled)
+			.filter((neighbour: Neighbour) => originCellDirections.includes(neighbour.direction))
+			.filter((neighbour: Neighbour) =>
+				this.areMatchingDirections(
+					neighbour.direction,
+					neighbour.cell.pipe.getConnectionDirections()
+				)
+			);
 		// .filter().canconnect()
+	}
+
+	areMatchingDirections(dir1: DIRECTION, dirArray: DIRECTION[]) {
+		if (dir1 === DIRECTION.NN) {
+			// NORTH matches SOUTH
+			return dirArray.includes(DIRECTION.SS);
+		} else if (dir1 === DIRECTION.EE) {
+			// EAST matches WEST
+			return dirArray.includes(DIRECTION.WW);
+		} else if (dir1 === DIRECTION.SS) {
+			// SOUTH matches NORTH
+			return dirArray.includes(DIRECTION.NN);
+		} else if (dir1 === DIRECTION.WW) {
+			// WEST matches EAST
+			return dirArray.includes(DIRECTION.EE);
+		}
+		return false;
 	}
 
 	findCell({gridColumn, gridRow}: CellConfig) {

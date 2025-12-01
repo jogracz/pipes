@@ -2,10 +2,10 @@ import gsap from "gsap";
 import {Container, Sprite, Texture} from "pixi.js";
 
 export enum DIRECTION {
-	NN,
-	EE,
-	SS,
-	WW,
+	NN = "NN",
+	EE = "EE",
+	SS = "SS",
+	WW = "WW",
 }
 
 export const ROTATIONS = [0, 90, 180, 270];
@@ -23,6 +23,7 @@ export class Pipe extends Container {
 	private _spriteDefault: Sprite;
 	private _spriteFilled: Sprite;
 	private _isActive: boolean = false;
+	private _isFilled: boolean = false;
 
 	private _isGrowing: boolean = false;
 
@@ -60,6 +61,10 @@ export class Pipe extends Container {
 		return this._isActive;
 	}
 
+	get isFilled() {
+		return this._isFilled;
+	}
+
 	animateActive() {
 		if (this._isGrowing) {
 			if (this.scale.x < 1.2) {
@@ -89,14 +94,20 @@ export class Pipe extends Container {
 		// or DIRECTION[direction+ROTATIONS.indexOf(rotation) +1]
 		// return DIRECTION[direction + rotation / 90];
 		const directionsClockWise = [DIRECTION.NN, DIRECTION.EE, DIRECTION.SS, DIRECTION.WW];
-		return directionsClockWise[direction + rotation / 90];
+		const directionIndex = directionsClockWise.indexOf(direction);
+		const newIndex = directionIndex + rotation / 90;
+		const maxIndex = directionsClockWise.length - 1;
+
+		return directionsClockWise[
+			newIndex > maxIndex ? newIndex - directionsClockWise.length : newIndex
+		];
 	}
 
 	async playWaterFlow() {
 		if (!this._spriteFilled) return;
 
 		const duration = 0.5;
-
+		this._isFilled = true;
 		await Promise.all([
 			gsap.to(this._spriteDefault, {alpha: 0, duration}),
 			gsap.to(this._spriteFilled, {alpha: 1, duration}),

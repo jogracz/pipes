@@ -12,8 +12,8 @@ gsap.registerPlugin(PixiPlugin);
 	// INITIATE PIXI APP
 	const pixiApp = new Application();
 	await pixiApp.init({
-		background: "#1099bb",
 		resizeTo: window,
+		antialias: false,
 	});
 
 	document.body.appendChild(pixiApp.canvas);

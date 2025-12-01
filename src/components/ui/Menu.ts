@@ -80,17 +80,6 @@ export class Menu extends Container {
 		button.alpha = 0.9;
 		button.eventMode = "static";
 
-		// const buttonLabel = new Text({
-		// 	text: "Start",
-		// 	style: new TextStyle({
-		// 		fontSize: 80,
-		// 		fill: "#ffffff",
-		// 		stroke: "#aaaaaa",
-		// 	}),
-		// });
-		// buttonLabel.anchor.set(0.5);
-		// button.addChild(buttonLabel);
-
 		button.on("pointerover", this.onHover);
 		button.on("pointerout", this.onHoverEnd);
 
@@ -103,10 +92,10 @@ export class Menu extends Container {
 				this._clickSound.play();
 				resolve();
 			};
-			this.button.onclick = onClick;
+			this.button.onpointerdown = onClick;
 			this.button.cursor = "pointer";
 		});
-		this.button.onclick = null;
+		this.button.onpointerdown = null;
 		this.button.cursor = "arrow";
 	}
 
@@ -167,5 +156,7 @@ export class Menu extends Container {
 		this.alpha = 1;
 	}
 
-	relayout() {}
+	relayout() {
+		this.x = -40;
+	}
 }

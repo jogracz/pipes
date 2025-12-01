@@ -149,10 +149,10 @@ export class Cell extends Container {
 				resolve();
 				callback(this);
 			};
-			this.onclick = onClick;
+			this.onpointerdown = onClick;
 			this.cursor = "pointer";
 		});
-		this.onclick = null;
+		this.onpointerdown = null;
 		this.cursor = "arrow";
 	}
 

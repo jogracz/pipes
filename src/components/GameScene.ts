@@ -224,16 +224,21 @@ export class GameScene extends Container {
 		}
 	}
 
-	relayout() {
-		this.x = window.innerWidth / 2;
-		this.y = window.innerHeight / 2;
-
-		Object.values(this.components).forEach((component) => component.relayout());
-		this.pipeQueue.x = this.pipeQueue.x + this.grid.x - 20;
-	}
-
 	reset() {
 		this.grid.reset(this.startPipe);
 		this.pipeQueue.reset();
+	}
+
+	relayout() {
+		this.x = window.innerWidth / 2 + 30;
+		this.y = window.innerHeight / 2;
+		if (window.innerWidth < 500 || window.innerHeight < 500) {
+			this.scale.set(0.6);
+		} else {
+			this.scale.set(1);
+		}
+
+		Object.values(this.components).forEach((component) => component.relayout());
+		this.pipeQueue.x = this.pipeQueue.x + this.grid.x - 20;
 	}
 }

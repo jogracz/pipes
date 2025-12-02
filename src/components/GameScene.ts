@@ -68,7 +68,7 @@ export class GameScene extends Container {
 			fontFamily: "Arial",
 			fontSize: 82,
 			fontWeight: "bold",
-			fill: "#66CCCC",
+			fill: "#f3f1e9ff",
 		});
 		loader.text = "Loading...";
 		loader.x = window.innerWidth / 2;

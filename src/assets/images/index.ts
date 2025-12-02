@@ -1,5 +1,5 @@
 export const button = require("./button.png");
-export const menu = require("./menu2.png");
+export const menu = require("./menu.png");
 export const pipesSpritesheet = require("./pipes_tileset.png");
 export const clouds = require("./orig_big 17.png"); //8!!,9!!,12,14,17!,18!,
 export const pipesAtlas = {

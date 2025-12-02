@@ -1,5 +1,5 @@
 import gsap from "gsap/all";
-import {Assets, Container, Sprite, Text, TextStyle} from "pixi.js";
+import {Container, Text, TextStyle} from "pixi.js";
 
 export class ResetButton extends Container {
 	private _onRestart: () => void;
@@ -36,8 +36,6 @@ export class ResetButton extends Container {
 		return label;
 	}
 	private async onHover() {
-		// Add stoping animation(timeline.to1)
-		// if (this.isBlocked && !this._isActive) return;
 		const vars = {
 			scale: 1,
 		};
@@ -51,8 +49,6 @@ export class ResetButton extends Container {
 	}
 
 	private async onHoverEnd() {
-		// if (this.isBlocked && !this._isActive) return;
-
 		const vars = {
 			scale: 0.95,
 		};
@@ -67,30 +63,10 @@ export class ResetButton extends Container {
 	}
 
 	onClick() {
-		console.log("RESET CLICK");
 		this._onRestart();
 	}
 
-	// async hide() {
-	// 	await gsap.to(this, {
-	// 		alpha: 0,
-	// 		duration: 0.2,
-	// 	});
-	// 	this.visible = false;
-	// }
-
-	// async show() {
-	// 	this.visible = true;
-	// 	await gsap.to(this, {
-	// 		alpha: 1,
-	// 		duration: 0.2,
-	// 	});
-	// }
-
-	reset() {
-		// this.visible = true;
-		// this.alpha = 1;
-	}
+	reset() {}
 
 	relayout() {}
 }

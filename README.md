@@ -1,6 +1,6 @@
 # pipes
 
-<img width="955" alt="Game Screenshot" src="https://github.com/jogracz/pipes/src/assets/images/pipesScreenshot.png">
+<img width="955" alt="Game Screenshot" src="https://github.com/jogracz/pipes/blob/main/src/assets/images/pipesScreenshot.png">
 
 # A simple Pipe Mania copy made with Pixi.js
 

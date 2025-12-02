@@ -4,15 +4,18 @@
 
 # A simple Pipe Mania copy made with Pixi.js
 
+The main idea was to make this game feel cozy and less stressfull than the original is.
+
 link
 
 ## created with:
 
--   Typescript
 -   Webpack
+-   Typescript
 -   Pixi.js
 -   gsap
 -   Howler.js
+-   free assets from itch.io <3
 
 ## what's implemented:
 
@@ -20,17 +23,20 @@ link
 -   random pipe queue generation,
 -   random blocked cell generation,
 -   random start pipe placement,
--   longest path finding logic,
 -   water flow animations,
--   winning logic //
--   losing logic,//
--   basic sounds for clicking on buttons, placing pipes, winning, and losing, //
+-   timer,
+-   checking path length,
+-   checking max result
+-   restarting game,
+-   background music,
+-   sounds,
 -   basic animations increasing ux appeal,
--   timer
+-   basic responsiveness
 
 ## what could be added/improved:
 
--   responsiveness,
+-   better responsiveness,
+-   longest path finding instead of total path length,
 -   add pooling for pipe sprites,
 -   better cell store and access system,
 -   better game state system,

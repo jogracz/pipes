@@ -18,7 +18,7 @@ export class PipeQueue extends Container {
 		this._config = config;
 		this._randomPipeGenerator = randomPipeGenerator;
 
-		this.populate();
+		// this.populate();
 	}
 
 	populate() {
@@ -84,14 +84,17 @@ export class PipeQueue extends Container {
 	}
 
 	reset() {
-		// this.clean();
-		// this.populate();
+		console.log("HELL");
+		// TOD: Add Pooling
+		this.clean();
+		this.populate();
 		// this.pipes.forEach((pipe: Pipe) => pipe.reset());
 		this.activate();
 	}
 
 	clean() {
 		this.pipes.forEach((pipe: Pipe) => pipe.destroy());
+		this.pipes = [];
 	}
 
 	update() {

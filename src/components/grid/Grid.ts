@@ -181,7 +181,14 @@ export class Grid extends Container {
 		return this.allCells.find((cell: Cell) => cell.checkPositionMatch({gridColumn, gridRow}));
 	}
 
+	cleanGrid() {
+		this.allCells.forEach((cell: Cell) => {
+			cell.reset();
+		});
+	}
+
 	reset(startPipe: Pipe) {
+		this.cleanGrid();
 		this.resetRandomBlockers();
 		this.resetRandomStart(startPipe);
 	}

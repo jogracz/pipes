@@ -3,8 +3,9 @@ import {Howl} from "howler";
 import {pipesAtlas, pipesSpritesheet, menu, button, clouds, sounds} from "../assets";
 import {Cell, Grid} from "./grid";
 import {RandomPipeGenerator, PipeQueue, Pipe, DIRECTION} from "./pipes";
-import {Menu, ResetButton, Timer} from "./ui";
+import {Menu, MaxResult, Timer, ResetButton} from "./ui";
 import {Config} from "../controller";
+import gsap from "gsap";
 
 enum PIPE_TYPE {
 	STRAIGHT,
@@ -21,9 +22,13 @@ const PIPE_DIRECTIONS = {
 export type GameSounds = {
 	bgMusic: Howl;
 	click: Howl;
+	water: Howl;
+	finish: Howl;
 };
 export class GameScene extends Container {
 	private _config: Config;
+	private _onRestart: () => void;
+	private _isActive: boolean = false;
 	private _bg: Sprite;
 	private _isLoaded = false;
 	private _loader: Text;
@@ -33,16 +38,18 @@ export class GameScene extends Container {
 	private pipeQueue: PipeQueue;
 	private grid: Grid;
 	private startPipe: Pipe;
+	private maxResult: MaxResult;
 	private resetButton: ResetButton;
 	private sounds: GameSounds;
 	isStarted: boolean = false;
 
 	private _randomPipeGenerator: RandomPipeGenerator;
 
-	constructor(config: Config) {
+	constructor(config: Config, onRestart: () => void) {
 		super();
 
 		this._config = config;
+		this._onRestart = onRestart;
 
 		this._loader = this.createLoader();
 		this.addChild(this._loader);
@@ -75,7 +82,6 @@ export class GameScene extends Container {
 		await Assets.load({alias: "cloudsBg", src: clouds});
 		await Assets.load({alias: "button", src: button});
 		await Assets.load({alias: "menu", src: menu});
-		// await Assets.load({alias: "sounds", src: sounds});
 
 		const pipeTexture = await Assets.load(pipesSpritesheet);
 		this.pipesSpritesheet = new Spritesheet(pipeTexture, pipesAtlas);
@@ -89,7 +95,8 @@ export class GameScene extends Container {
 		this.sounds = {
 			click: new Howl({src: sounds.clickSound}),
 			bgMusic: new Howl({src: sounds.bgMusic}),
-			// won: new Howl({src: sounds.wonSoundUrl}),
+			finish: new Howl({src: sounds.finishSound}),
+			water: new Howl({src: sounds.waterSound}),
 		};
 	}
 
@@ -100,10 +107,16 @@ export class GameScene extends Container {
 		this.sounds.bgMusic.fade(0, 0.5, 2000);
 	}
 
+	playWaterSound() {
+		this.sounds.water.volume(0.7);
+		this.sounds.water.play();
+	}
+
 	mountComponents() {
 		this.mountBackground();
 		this.mountTimer();
-		this.mountResetButton();
+		this.mountMaxResult();
+		this.mountResetButtont();
 		this.mountMenu();
 		this.mountPipeQueue();
 		this.mountGrid();
@@ -161,27 +174,57 @@ export class GameScene extends Container {
 		this.addChild(this.timer);
 	}
 
-	mountResetButton() {
-		this.resetButton = new ResetButton();
-		this.resetButton.x = 185;
+	mountMaxResult() {
+		this.maxResult = new MaxResult();
+		this.maxResult.x = 155;
+		this.maxResult.y = -240;
+		this.maxResult.visible = false;
+		this.addChild(this.maxResult);
+	}
+
+	mountResetButtont() {
+		this.resetButton = new ResetButton(() => this._onRestart());
+		this.resetButton.x = -24;
 		this.resetButton.y = -240;
 		this.resetButton.visible = false;
 		this.addChild(this.resetButton);
+	}
+
+	updateMaxResult(value: number) {
+		this.maxResult.updateValue(value);
+	}
+
+	async awaitStartClick() {
+		await this.menu.awaitStartClick();
 	}
 
 	get isLoaded() {
 		return this._isLoaded;
 	}
 
+	get isActive() {
+		return this._isActive;
+	}
+
 	activateBoard() {
+		this._isActive = true;
 		this.grid.activate();
 		this.pipeQueue.activate();
+
+		this.lightsOn();
+	}
+
+	deactivateBoard() {
+		this._isActive = false;
+		this.grid.deactivate();
+		this.pipeQueue.deactivate();
 	}
 
 	showBoard() {
 		this.grid.visible = true;
 		this.pipeQueue.visible = true;
 		this.timer.visible = true;
+		this.maxResult.visible = true;
 		this.resetButton.visible = true;
 	}
 
@@ -191,6 +234,8 @@ export class GameScene extends Container {
 			grid: this.grid,
 			pipeQueue: this.pipeQueue,
 			timer: this.timer,
+			maxResult: this.maxResult,
+			resetButton: this.resetButton,
 		};
 	}
 
@@ -218,6 +263,28 @@ export class GameScene extends Container {
 		return this.grid.getValidNeighbours(cell);
 	}
 
+	async finish() {
+		this.sounds.finish.play();
+		await this.lightsOff();
+		this.resetButton.alpha = 1;
+	}
+
+	async lightsOff() {
+		await Promise.all(
+			Object.values(this.components).map((component: Object) =>
+				gsap.to(component, {alpha: 0.8, duration: 0.2})
+			)
+		);
+	}
+
+	async lightsOn() {
+		await Promise.all(
+			Object.values(this.components).map((component: Object) =>
+				gsap.to(component, {alpha: 1, duration: 0.2})
+			)
+		);
+	}
+
 	async update() {
 		if (this.isLoaded) {
 			this.pipeQueue.update();
@@ -227,6 +294,7 @@ export class GameScene extends Container {
 	reset() {
 		this.grid.reset(this.startPipe);
 		this.pipeQueue.reset();
+		this.relayout();
 	}
 
 	relayout() {

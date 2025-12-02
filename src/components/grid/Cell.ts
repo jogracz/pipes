@@ -17,6 +17,7 @@ export class Cell extends Container {
 	private _isBlocked = false;
 	private _isActive: boolean = false;
 	private _isStart: boolean = false;
+	private pipeContainer: Container = new Container();
 	pipe: Pipe;
 
 	constructor(config: CellConfig, clickSound: Howl) {
@@ -27,6 +28,7 @@ export class Cell extends Container {
 		this.background = new Graphics().roundRect(-16, -16, 32, 32, 4).fill(COLOR_DEFAULT);
 
 		this.addChild(this.background);
+		this.addChild(this.pipeContainer);
 
 		this.eventMode = "static";
 	}
@@ -99,11 +101,12 @@ export class Cell extends Container {
 		this.setActive(false);
 		this.pipe = pipe;
 		this.pipe.visible = true;
-		this.addChild(this.pipe);
+		this.pipeContainer.addChild(this.pipe);
 		this.pipe.position.set(0);
 	}
 
 	removePipe() {
+		this.pipeContainer.removeChildren();
 		this.pipe = null;
 	}
 

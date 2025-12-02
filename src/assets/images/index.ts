@@ -1,7 +1,7 @@
-export const button = require("./button.png");
-export const menu = require("./menu.png");
-export const pipesSpritesheet = require("./pipes_tileset.png");
-export const clouds = require("./orig_big 17.png"); //8!!,9!!,12,14,17!,18!,
+import button from "./button.png";
+import menu from "./menu.png";
+import pipesSpritesheet from "./pipes_tileset.png";
+import clouds from "./orig_big 17.png";
 export const pipesAtlas = {
 	frames: {
 		straight: {
@@ -46,7 +46,5 @@ export const pipesAtlas = {
 		size: {w: 192, h: 160},
 		scale: 1,
 	},
-	// animations: {
-	//   enemy: ['enemy1', 'enemy2'], //array of frames by name
-	// },
 };
+export {button, menu, pipesSpritesheet, clouds};

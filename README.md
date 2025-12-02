@@ -42,7 +42,8 @@ link
 -   better game state system,
 -   better animations,
 -   tests,
--   optimize sound files
+-   optimize sound files,
+-   add parallax animation to background (clouds)
 
 ## To run it locally, clone this repo and run:
 

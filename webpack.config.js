@@ -7,7 +7,11 @@ module.exports = {
 	devServer: {
 		static: "./dist",
 	},
-	plugins: [new HtmlWebpackPlugin({title: "Chill Pipes"})],
+	plugins: [
+		new HtmlWebpackPlugin({
+			title: "Chill Pipes",
+		}),
+	],
 	optimization: {
 		runtimeChunk: "single",
 	},
@@ -24,7 +28,7 @@ module.exports = {
 				use: ["style-loader", "css-loader"],
 			},
 			{
-				test: /\.(png|svg|jpg|jpeg|gif|mp3|wav)$/i,
+				test: /\.(png|svg|jpg|jpeg|gif|mp3|wav|ico)$/i,
 				type: "asset/resource",
 			},
 			{

@@ -101,8 +101,8 @@ export class GameScene extends Container {
 
 	playBgMusic() {
 		this._sounds.bgMusic.volume(0);
-		this._sounds.bgMusic.play();
 		this._sounds.bgMusic.loop();
+		this._sounds.bgMusic.play();
 		this._sounds.bgMusic.fade(0, 0.5, 2000);
 	}
 

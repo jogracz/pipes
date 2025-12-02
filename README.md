@@ -42,6 +42,7 @@ link
 -   better game state system,
 -   better animations,
 -   tests,
+-   optimize sound files
 
 ## To run it locally, clone this repo and run:
 

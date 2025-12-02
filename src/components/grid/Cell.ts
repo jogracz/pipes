@@ -11,26 +11,30 @@ const COLOR_DEFAULT = "#f3f1e9ff";
 const OPACITY_BLOCKED = 0.4;
 const OPACITY_DEFAULT = 0.9;
 export class Cell extends Container {
-	config: CellConfig;
+	private _config: CellConfig;
 	private _clickSound: Howl;
-	private background: Graphics;
+	private _background: Graphics;
 	private _isBlocked = false;
 	private _isActive: boolean = false;
 	private _isStart: boolean = false;
-	private pipeContainer: Container = new Container();
+	private _pipeContainer: Container = new Container();
 	pipe: Pipe;
 
 	constructor(config: CellConfig, clickSound: Howl) {
 		super();
-		this.config = config;
+		this._config = config;
 		this._clickSound = clickSound;
 
-		this.background = new Graphics().roundRect(-16, -16, 32, 32, 4).fill(COLOR_DEFAULT);
+		this._background = new Graphics().roundRect(-16, -16, 32, 32, 4).fill(COLOR_DEFAULT);
 
-		this.addChild(this.background);
-		this.addChild(this.pipeContainer);
+		this.addChild(this._background);
+		this.addChild(this._pipeContainer);
 
 		this.eventMode = "static";
+	}
+
+	get config() {
+		return this._config;
 	}
 
 	private async onHover() {
@@ -89,24 +93,24 @@ export class Cell extends Container {
 
 	block() {
 		this._isBlocked = true;
-		this.background.alpha = OPACITY_BLOCKED;
+		this._background.alpha = OPACITY_BLOCKED;
 	}
 
 	unblock() {
 		this._isBlocked = false;
-		this.background.alpha = OPACITY_DEFAULT;
+		this._background.alpha = OPACITY_DEFAULT;
 	}
 
 	addPipe(pipe: Pipe) {
 		this.setActive(false);
 		this.pipe = pipe;
 		this.pipe.visible = true;
-		this.pipeContainer.addChild(this.pipe);
+		this._pipeContainer.addChild(this.pipe);
 		this.pipe.position.set(0);
 	}
 
 	removePipe() {
-		this.pipeContainer.removeChildren();
+		this._pipeContainer.removeChildren();
 		this.pipe = null;
 	}
 

@@ -1,4 +1,4 @@
-import {Container, PipelineSystem, Sprite, Spritesheet} from "pixi.js";
+import {Spritesheet} from "pixi.js";
 import {pipesAtlas} from "../../assets";
 import {getRandomElement} from "../../utils";
 import {Pipe} from "./";
@@ -15,17 +15,13 @@ enum PIPE_TYPES {
 }
 
 export class RandomPipeGenerator {
-	private _isLoaded = false;
-	private _loader: Text;
-	private _pool: Pipe[]; //pool here or elsewhere?
 	private _pipesSpritesheet: Spritesheet<typeof pipesAtlas>;
-	private pipeDictionary: any;
-	// private _sprite: Sprite;
+	private _pipeDictionary: any;
 
 	constructor(pipesSpriteSheet: Spritesheet<typeof pipesAtlas>) {
 		this._pipesSpritesheet = pipesSpriteSheet;
 
-		this.pipeDictionary = {
+		this._pipeDictionary = {
 			[PIPE_TYPES.STRAIGHT]: {
 				texture: this._pipesSpritesheet.textures.straight,
 				textureFilled: this._pipesSpritesheet.textures.straightFilled,
@@ -49,10 +45,10 @@ export class RandomPipeGenerator {
 		const randomRotation = getRandomElement(ROTATIONS);
 
 		return new Pipe({
-			texture: this.pipeDictionary[randomType].texture,
-			textureFilled: this.pipeDictionary[randomType].textureFilled,
+			texture: this._pipeDictionary[randomType].texture,
+			textureFilled: this._pipeDictionary[randomType].textureFilled,
 			rotation: randomRotation,
-			defaultDirections: this.pipeDictionary[randomType].defaultDirections,
+			defaultDirections: this._pipeDictionary[randomType].defaultDirections,
 		});
 	}
 }

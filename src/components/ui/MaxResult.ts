@@ -1,20 +1,20 @@
 import {Container, Text, TextStyle} from "pixi.js";
 
 export class MaxResult extends Container {
-	private value: number = 0;
-	private valueLabel: Text;
+	private _value: number = 0;
+	private _valueLabel: Text;
 
 	constructor() {
 		super();
 
-		this.valueLabel = this.createLabel();
-		this.addChild(this.valueLabel);
+		this._valueLabel = this.createLabel();
+		this.addChild(this._valueLabel);
 	}
 
 	createLabel() {
 		const label = new Text({
 			// text: "\u21BA",
-			text: this.formatLabel(this.value),
+			text: this.formatLabel(this._value),
 			style: new TextStyle({
 				align: "left",
 				fontSize: 28,
@@ -33,7 +33,7 @@ export class MaxResult extends Container {
 	}
 
 	updateValue(value: number) {
-		this.valueLabel.text = this.formatLabel(value);
+		this._valueLabel.text = this.formatLabel(value);
 	}
 
 	relayout() {}

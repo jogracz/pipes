@@ -3,15 +3,15 @@ import {Container, Text, TextStyle} from "pixi.js";
 
 export class ResetButton extends Container {
 	private _onRestart: () => void;
-	private icon: Text;
+	private _icon: Text;
 
 	constructor(onRestart: () => void) {
 		super();
 
 		this._onRestart = onRestart;
 
-		this.icon = this.createLabel();
-		this.addChild(this.icon);
+		this._icon = this.createLabel();
+		this.addChild(this._icon);
 
 		this.eventMode = "static";
 		this.cursor = "pointer";

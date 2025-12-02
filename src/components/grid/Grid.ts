@@ -14,15 +14,15 @@ export type Neighbour = {
 	cell?: Cell;
 };
 export class Grid extends Container {
-	private config: GridConfig;
+	private _config: GridConfig;
 	private _clickSound: Howl;
-	private allCells: Cell[] = [];
-	private blockedCells: Cell[] = [];
+	private _allCells: Cell[] = [];
+	private _blockedCells: Cell[] = [];
 	private _startCell: Cell;
 	private _isActive: boolean = false;
 	constructor(config: GridConfig, clickSound: Howl) {
 		super();
-		this.config = config;
+		this._config = config;
 		this._clickSound = clickSound;
 
 		this.populate();
@@ -30,10 +30,10 @@ export class Grid extends Container {
 
 	populate() {
 		const padding = 2;
-		for (let i = 0; i < this.config.columnsCount; i++) {
-			for (let j = 0; j < this.config.rowsCount; j++) {
+		for (let i = 0; i < this._config.columnsCount; i++) {
+			for (let j = 0; j < this._config.rowsCount; j++) {
 				const cell = new Cell({gridColumn: i, gridRow: j}, this._clickSound);
-				this.allCells.push(cell);
+				this._allCells.push(cell);
 				cell.x = i * (cell.width + padding);
 				cell.y = j * (cell.height + padding);
 				this.addChild(cell);
@@ -42,22 +42,22 @@ export class Grid extends Container {
 	}
 
 	private resetRandomBlockers() {
-		this.allCells.forEach((cell: Cell) => {
+		this._allCells.forEach((cell: Cell) => {
 			cell.unblock();
 		});
 
-		for (let i = 0; i < this.config.blockersCount; i++) {
-			const randomCell: Cell = getRandomElement(this.allCells);
+		for (let i = 0; i < this._config.blockersCount; i++) {
+			const randomCell: Cell = getRandomElement(this._allCells);
 			if (!randomCell.isBlocked) {
 				randomCell.block();
-				this.blockedCells.push(randomCell);
+				this._blockedCells.push(randomCell);
 			}
 		}
 	}
 
 	private resetRandomStart(startPipe: Pipe) {
 		this._startCell = getRandomElement(
-			this.allCells
+			this._allCells
 				.filter((cell: Cell) => this.getIsNotLastRow(cell))
 				.filter((cell: Cell) => this.getIsNotBlocked(cell))
 		);
@@ -70,7 +70,7 @@ export class Grid extends Container {
 	}
 
 	getIsNotLastRow(cell: Cell) {
-		return cell.config.gridRow !== this.config.rowsCount - 1;
+		return cell.config.gridRow !== this._config.rowsCount - 1;
 	}
 
 	getIsNotBlocked(cell: Cell) {
@@ -84,16 +84,16 @@ export class Grid extends Container {
 
 	activate() {
 		this._isActive = true;
-		this.allCells.forEach((cell: Cell) => cell.setActive(!cell.isBlocked && !cell.hasPipe));
+		this._allCells.forEach((cell: Cell) => cell.setActive(!cell.isBlocked && !cell.hasPipe));
 	}
 
 	deactivate() {
 		this._isActive = false;
-		this.allCells.forEach((cell: Cell) => cell.setActive(false));
+		this._allCells.forEach((cell: Cell) => cell.setActive(false));
 	}
 
 	getActiveCells() {
-		return this.allCells.filter((cell: Cell) => cell.isActive);
+		return this._allCells.filter((cell: Cell) => cell.isActive);
 	}
 
 	async waitForMove(callback: (cell: Cell) => void) {
@@ -172,17 +172,17 @@ export class Grid extends Container {
 		if (
 			gridColumn < 0 ||
 			gridRow < 0 ||
-			gridColumn >= this.config.columnsCount ||
-			gridRow >= this.config.rowsCount
+			gridColumn >= this._config.columnsCount ||
+			gridRow >= this._config.rowsCount
 		) {
 			return null;
 		}
 
-		return this.allCells.find((cell: Cell) => cell.checkPositionMatch({gridColumn, gridRow}));
+		return this._allCells.find((cell: Cell) => cell.checkPositionMatch({gridColumn, gridRow}));
 	}
 
 	cleanGrid() {
-		this.allCells.forEach((cell: Cell) => {
+		this._allCells.forEach((cell: Cell) => {
 			cell.reset();
 		});
 	}

@@ -10,7 +10,7 @@ interface PipeQueueConfig {
 export class PipeQueue extends Container {
 	private _config: PipeQueueConfig;
 	private _randomPipeGenerator: RandomPipeGenerator;
-	private pipes: Pipe[] = [];
+	private _pipes: Pipe[] = [];
 	private _isActive = false;
 
 	constructor(config: PipeQueueConfig, randomPipeGenerator: RandomPipeGenerator) {
@@ -23,7 +23,7 @@ export class PipeQueue extends Container {
 		for (let i = 0; i < this._config.length; i++) {
 			const pipe = this._randomPipeGenerator.generate();
 			pipe.y = i * this.getSpacing();
-			this.pipes.push(pipe);
+			this._pipes.push(pipe);
 			this.addChild(pipe);
 		}
 	}
@@ -34,7 +34,7 @@ export class PipeQueue extends Container {
 	}
 
 	getCurrentPipe(): Pipe {
-		const currentPipe = this.pipes.shift();
+		const currentPipe = this._pipes.shift();
 		currentPipe.setActive(false);
 		currentPipe.y = 0;
 		this.addNewPipe();
@@ -45,14 +45,14 @@ export class PipeQueue extends Container {
 		const newPipe = this._randomPipeGenerator.generate();
 		newPipe.y = this._config.length * this.getSpacing();
 		this.addChild(newPipe);
-		this.pipes.push(newPipe);
+		this._pipes.push(newPipe);
 		await this.rearangePipes();
 	}
 
 	async rearangePipes() {
 		this.deactivate();
 		await Promise.all(
-			this.pipes.map(async (pipe: Pipe) => {
+			this._pipes.map(async (pipe: Pipe) => {
 				const currentY = pipe.y;
 				return await gsap.to(pipe, {
 					y: currentY - this.getSpacing(),
@@ -64,7 +64,7 @@ export class PipeQueue extends Container {
 	}
 
 	activateCurrentPipe() {
-		this.pipes[0].setActive(true);
+		this._pipes[0].setActive(true);
 	}
 
 	activate() {
@@ -74,7 +74,7 @@ export class PipeQueue extends Container {
 
 	deactivate() {
 		this._isActive = false;
-		this.pipes.forEach((pipe: Pipe) => pipe.setActive(false));
+		this._pipes.forEach((pipe: Pipe) => pipe.setActive(false));
 	}
 
 	get isActive() {
@@ -89,12 +89,12 @@ export class PipeQueue extends Container {
 	}
 
 	clean() {
-		this.pipes.forEach((pipe: Pipe) => pipe.destroy());
-		this.pipes = [];
+		this._pipes.forEach((pipe: Pipe) => pipe.destroy());
+		this._pipes = [];
 	}
 
 	update() {
-		this.pipes.forEach((pipe: Pipe) => pipe.update());
+		this._pipes.forEach((pipe: Pipe) => pipe.update());
 	}
 
 	relayout() {

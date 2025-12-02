@@ -4,6 +4,7 @@ html {
 	padding: 0 !important;
 	box-sizing: border-box !important;
 }
-body {
+body,
+canvas {
 	background: rgb(133, 60, 182);
 }

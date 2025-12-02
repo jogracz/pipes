@@ -6,23 +6,23 @@ interface TimerConfig {
 
 export class Timer extends Container {
 	private _config: TimerConfig;
-	private timeLabel: Text;
-	private value: number;
+	private _timeLabel: Text;
+	private _value: number;
 
 	constructor(config: TimerConfig) {
 		super();
 
 		this._config = config;
 
-		this.value = this._config.defaultValue;
-		this.timeLabel = this.createLabel();
+		this._value = this._config.defaultValue;
+		this._timeLabel = this.createLabel();
 
-		this.addChild(this.timeLabel);
+		this.addChild(this._timeLabel);
 	}
 
 	createLabel() {
 		const label = new Text({
-			text: this.formatLabel(this.value),
+			text: this.formatLabel(this._value),
 			style: new TextStyle({
 				align: "left",
 				fontSize: 28,
@@ -37,17 +37,17 @@ export class Timer extends Container {
 	}
 
 	updateTime(intervalDelay: number, stopCallBack: () => void) {
-		this.value = this.value - intervalDelay;
-		this.timeLabel.text = this.formatLabel(this.value);
-		if (this.value < intervalDelay) {
+		this._value = this._value - intervalDelay;
+		this._timeLabel.text = this.formatLabel(this._value);
+		if (this._value < intervalDelay) {
 			this.stop();
 			stopCallBack();
 		}
 	}
 
 	stop() {
-		this.value = 0;
-		this.timeLabel.text = this.formatLabel(this.value);
+		this._value = 0;
+		this._timeLabel.text = this.formatLabel(this._value);
 	}
 
 	private formatLabel(valueInMs: number): string {
@@ -55,24 +55,8 @@ export class Timer extends Container {
 		return `Time: ${date.getSeconds()}:${date.getMilliseconds() / 100}`;
 	}
 
-	// async hide() {
-	// 	await gsap.to(this, {
-	// 		alpha: 0,
-	// 		duration: 0.2,
-	// 	});
-	// 	this.visible = false;
-	// }
-
-	// async show() {
-	// 	this.visible = true;
-	// 	await gsap.to(this, {
-	// 		alpha: 1,
-	// 		duration: 0.2,
-	// 	});
-	// }
-
 	reset() {
-		this.value = this._config.defaultValue;
+		this._value = this._config.defaultValue;
 	}
 
 	relayout() {}

@@ -8,9 +8,9 @@ interface MenuConfig {
 export class Menu extends Container {
 	private _config: MenuConfig;
 	private _clickSound: Howl;
-	private bg: Sprite;
-	private gameName: Text;
-	private button: Sprite;
+	private _bg: Sprite;
+	private _gameName: Text;
+	private _button: Sprite;
 
 	constructor(config: MenuConfig, clickSound: Howl) {
 		super();
@@ -18,14 +18,14 @@ export class Menu extends Container {
 		this._config = config;
 		this._clickSound = clickSound;
 
-		this.bg = this.createBackground();
-		this.gameName = this.createGameNameLabel();
+		this._bg = this.createBackground();
+		this._gameName = this.createGameNameLabel();
 
-		this.button = this.createStartButton();
+		this._button = this.createStartButton();
 
-		this.addChild(this.bg);
-		this.addChild(this.gameName);
-		this.addChild(this.button);
+		this.addChild(this._bg);
+		this.addChild(this._gameName);
+		this.addChild(this._button);
 	}
 
 	createBackground() {
@@ -78,11 +78,11 @@ export class Menu extends Container {
 				this._clickSound.play();
 				resolve();
 			};
-			this.button.onpointerdown = onClick;
-			this.button.cursor = "pointer";
+			this._button.onpointerdown = onClick;
+			this._button.cursor = "pointer";
 		});
-		this.button.onpointerdown = null;
-		this.button.cursor = "arrow";
+		this._button.onpointerdown = null;
+		this._button.cursor = "arrow";
 	}
 
 	async onHover() {

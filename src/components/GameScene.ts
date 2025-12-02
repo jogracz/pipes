@@ -108,8 +108,13 @@ export class GameScene extends Container {
 	}
 
 	playWaterSound() {
-		this.sounds.water.volume(0.7);
+		this.sounds.water.volume(0.6);
 		this.sounds.water.play();
+	}
+
+	playClickSound() {
+		this.sounds.click.volume(0.7);
+		this.sounds.click.play();
 	}
 
 	mountComponents() {
@@ -256,7 +261,7 @@ export class GameScene extends Container {
 	}
 
 	hasActiveCells() {
-		return this.getActiveCells().length > 50;
+		return this.getActiveCells().length > 0;
 	}
 
 	getValidNeighbours(cell: Cell) {

@@ -5,6 +5,6 @@
 		"rows": 7,
 		"blockedCells": 5
 	},
-	"waterStartDelayinMs": 4000,
+	"waterStartDelayinMs": 23000,
 	"pipeQueueLength": 5
 }

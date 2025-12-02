@@ -29,7 +29,7 @@ export class GameController {
 
 	async loadAssets() {
 		// LOADING
-		console.log("--LOADING...--");
+		console.log("-LOADING...-");
 
 		await this.gameScene.load();
 	}
@@ -37,7 +37,7 @@ export class GameController {
 	async prepareGame() {
 		// MAIN_MENU: "MAIN_MENU",
 		await this.gameScene.awaitStartClick();
-		console.log("--START CLICKED--");
+		console.log("-START CLICKED-");
 
 		// PREPARE NEW BOARD
 		this.resetBoard();
@@ -176,8 +176,9 @@ export class GameController {
 	}
 
 	restart() {
-		console.log("--RESTART--");
+		console.log("-RESTART-");
 
+		this.gameScene.playClickSound();
 		this.resetController();
 		this.resetBoard();
 		this.gameScene.activateBoard();

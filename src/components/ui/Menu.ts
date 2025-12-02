@@ -11,7 +11,6 @@ export class Menu extends Container {
 	private bg: Sprite;
 	private gameName: Text;
 	private button: Sprite;
-	private buttonLabel: Text;
 
 	constructor(config: MenuConfig, clickSound: Howl) {
 		super();
@@ -34,21 +33,8 @@ export class Menu extends Container {
 		// fix pixel-art antialiasing
 		texture.source.scaleMode = "nearest";
 		const bg = Sprite.from(texture);
-		bg.scale.set(7);
+		bg.scale.set(7.5);
 		bg.anchor.set(0.5);
-
-		// const gameNameLabel = new Text({
-		// 	text: this._config.gameName,
-		// 	style: new TextStyle({
-		// 		fontSize: 60,
-		// 		fill: "#dfe8e9ff",
-		// 		stroke: "#aaaaaa",
-		// 		fontWeight: "bolder",
-		// 	}),
-		// });
-		// gameNameLabel.anchor.set(0.5);
-		// // gameNameLabel.y = -320;
-		// bg.addChild(gameNameLabel);
 
 		return bg;
 	}
@@ -57,7 +43,7 @@ export class Menu extends Container {
 		const gameNameLabel = new Text({
 			text: this._config.gameName,
 			style: new TextStyle({
-				fontSize: 40,
+				fontSize: 30,
 				fill: "#fffaf1ff",
 				stroke: "#44444444",
 				fontWeight: "bolder",
@@ -65,7 +51,7 @@ export class Menu extends Container {
 		});
 		gameNameLabel.anchor.set(0.5);
 		gameNameLabel.x = 2;
-		gameNameLabel.y = -240;
+		gameNameLabel.y = -260;
 
 		return gameNameLabel;
 	}
@@ -100,7 +86,6 @@ export class Menu extends Container {
 	}
 
 	async onHover() {
-		// if (this.isBlocked && !this._isActive) return;
 		const vars = {
 			scale: 4,
 			alpha: 0.9,
@@ -117,8 +102,6 @@ export class Menu extends Container {
 	}
 
 	async onHoverEnd() {
-		// if (this.isBlocked && !this._isActive) return;
-
 		const vars = {
 			scale: 3.85,
 			alpha: 1,

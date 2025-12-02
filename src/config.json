@@ -1,10 +1,10 @@
 {
-	"gameName": "Pipes!",
+	"gameName": "Chill Pipes",
 	"grid": {
 		"columns": 9,
 		"rows": 7,
 		"blockedCells": 5
 	},
-	"waterStartDelayinMs": 23000,
+	"waterStartDelayinMs": 13000,
 	"pipeQueueLength": 5
 }

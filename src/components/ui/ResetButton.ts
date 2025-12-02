@@ -2,10 +2,13 @@ import gsap from "gsap/all";
 import {Assets, Container, Sprite, Text, TextStyle} from "pixi.js";
 
 export class ResetButton extends Container {
+	private _onRestart: () => void;
 	private icon: Text;
 
-	constructor() {
+	constructor(onRestart: () => void) {
 		super();
+
+		this._onRestart = onRestart;
 
 		this.icon = this.createLabel();
 		this.addChild(this.icon);
@@ -14,6 +17,7 @@ export class ResetButton extends Container {
 		this.cursor = "pointer";
 		this.onpointerover = () => this.onHover();
 		this.onpointerout = () => this.onHoverEnd();
+		this.onpointerdown = () => this.onClick();
 	}
 
 	createLabel() {
@@ -42,15 +46,7 @@ export class ResetButton extends Container {
 			onUpdate: () => {
 				this.scale.set(vars.scale);
 			},
-			duration: 0.1,
-		});
-
-		await gsap.to(vars, {
-			scale: 0.95,
-			onUpdate: () => {
-				this.scale.set(vars.scale);
-			},
-			duration: 0.05,
+			duration: 0.15,
 		});
 	}
 
@@ -72,6 +68,7 @@ export class ResetButton extends Container {
 
 	onClick() {
 		console.log("RESET CLICK");
+		this._onRestart();
 	}
 
 	// async hide() {

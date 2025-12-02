@@ -73,8 +73,6 @@ export class Timer extends Container {
 
 	reset() {
 		this.value = this._config.defaultValue;
-		// this.visible = true;
-		// this.alpha = 1;
 	}
 
 	relayout() {}

@@ -1,9 +1,8 @@
 import "./style.css";
-import {Application, Ticker} from "pixi.js";
-import {GameScene} from "./components";
+import {Application} from "pixi.js";
 import {gsap} from "gsap";
 import {PixiPlugin} from "gsap/PixiPlugin";
-import {GameMediator} from "./controller";
+import {GameController} from "./controller";
 import config from "./config.json";
 
 gsap.registerPlugin(PixiPlugin);
@@ -17,15 +16,16 @@ gsap.registerPlugin(PixiPlugin);
 	});
 	document.body.appendChild(pixiApp.canvas);
 
-	const gameMediator = new GameMediator(config);
+	const gameController = new GameController(config);
 
-	pixiApp.stage.addChild(gameMediator.gameScene);
-	window.addEventListener("resize", () => gameMediator.gameScene.relayout());
+	pixiApp.stage.addChild(gameController.gameScene);
+	window.addEventListener("resize", () => gameController.gameScene.relayout());
 
 	pixiApp.ticker.add(() => {
-		gameMediator.update();
+		gameController.update();
 	});
 
-	await gameMediator.loadAssets();
-	await gameMediator.startGame();
+	await gameController.loadAssets();
+	await gameController.prepareGame();
+	await gameController.startGame();
 })();

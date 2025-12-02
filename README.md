@@ -1,6 +1,6 @@
 # pipes
 
-<img width="955" alt="Game Screenshot" src="https://github.com/jogracz/pixi-slot-game/assets/images/pipesScreenshot.png">
+<img width="955" alt="Game Screenshot" src="https://github.com/jogracz/pixi-slot-game/src/assets/images/pipesScreenshot.png">
 
 # A simple Pipe Mania copy made with Pixi.js
 

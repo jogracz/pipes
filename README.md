@@ -1,4 +1,4 @@
-# pipes
+# CHILL PIPES
 
 <img width="955" alt="Game Screenshot" src="https://github.com/jogracz/pipes/blob/main/src/assets/images/pipesScreenshot.png">
 

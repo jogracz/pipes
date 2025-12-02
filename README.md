@@ -6,7 +6,7 @@
 
 The main idea was to make this game feel cozy and less stressfull than the original is.
 
-link
+Play it here: https://jogracz.github.io/pipes/
 
 ## created with:
 

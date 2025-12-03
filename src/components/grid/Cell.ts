@@ -173,6 +173,7 @@ export class Cell extends Container {
 	}
 
 	reset() {
+		this.onpointerdown = null;
 		this.removePipe();
 		this.unblock();
 		this.setActive(false);
